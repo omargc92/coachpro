@@ -1,0 +1,60 @@
+name: QA (Playwright)
+
+# Corre el QA automatizado DESPUÉS de cada deploy de PRODUCCIÓN de Vercel
+# (Vercel envía un `deployment_status` a GitHub al terminar). También se puede
+# disparar a mano contra cualquier URL.
+on:
+  deployment_status:
+  workflow_dispatch:
+    inputs:
+      url:
+        description: URL a probar
+        default: https://coachpro-livid.vercel.app
+        required: false
+
+permissions:
+  contents: read
+
+jobs:
+  qa:
+    # Solo en deploys de producción exitosos, o ejecución manual.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.deployment_status.state == 'success' &&
+       contains(github.event.deployment_status.environment, 'Production'))
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Instalar dependencias
+        run: npm ci
+
+      - name: Instalar Chromium (Playwright)
+        run: npx playwright install --with-deps chromium
+
+      - name: Esperar a que el deploy esté servido
+        run: sleep 8
+
+      - name: Correr QA
+        env:
+          QA_BROWSER: chromium
+          QA_URL: ${{ github.event.deployment_status.environment_url || github.event.inputs.url || 'https://coachpro-livid.vercel.app' }}
+          # Credenciales demo (override con secrets si las rotas):
+          QA_COACH_EMAIL: ${{ secrets.QA_COACH_EMAIL || 'coach@coachpro.app' }}
+          QA_COACH_PASS: ${{ secrets.QA_COACH_PASS || 'CoachPro-2026' }}
+          QA_TOKEN: ${{ secrets.QA_TOKEN || 'ed866fae-d554-44b6-a98b-0df2c329e307' }}
+        run: npm run qa
+
+      - name: Subir capturas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qa-screenshots
+          path: qa/screenshots/
+          if-no-files-found: ignore
+          retention-days: 14

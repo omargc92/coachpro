@@ -64,13 +64,15 @@ async function main() {
   console.log(`\n${C.b}CoachPro · QA automatizado${C.x}`)
   console.log(`${C.dim}URL: ${CFG.url}${C.x}\n`)
 
+  // En CI usa el Chromium de Playwright (QA_BROWSER=chromium); en local, el Chrome del sistema.
+  const preferChromium = process.env.QA_BROWSER === 'chromium'
   let browser
   try {
-    browser = await chromium.launch({ channel: 'chrome' })
+    browser = preferChromium ? await chromium.launch() : await chromium.launch({ channel: 'chrome' })
   } catch {
-    console.log(`${C.y}Chrome del sistema no disponible; usando Chromium de Playwright…${C.x}`)
+    console.log(`${C.y}Navegador primario no disponible; probando alternativa…${C.x}`)
     try {
-      browser = await chromium.launch()
+      browser = preferChromium ? await chromium.launch({ channel: 'chrome' }) : await chromium.launch()
     } catch (e) {
       console.log(`${C.no}No se pudo lanzar navegador.${C.x} Instala Chrome o corre: npx playwright install chromium\n${e.message}`)
       process.exit(2)
