@@ -70,20 +70,13 @@ export function InstallBanner() {
         gap: space.sm
       }}
     >
-      <div
-        style={{
-          width: 38,
-          height: 38,
-          borderRadius: 10,
-          background: colors.bg,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexShrink: 0
-        }}
-      >
-        <Icon name="bolt" size={22} color={colors.accent} />
-      </div>
+      <img
+        src="/logo.png"
+        alt="CoachPro"
+        width={38}
+        height={38}
+        style={{ borderRadius: '50%', display: 'block', flexShrink: 0 }}
+      />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ ...font.small, fontWeight: 600, color: colors.title }}>
           Instala CoachPro en tu teléfono

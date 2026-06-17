@@ -85,11 +85,11 @@ npm run dev
   `status-bar-style: black-translucent`, `apple-touch-icon`).
 - En el portal del atleta aparece un **banner discreto de instalación** cuando el navegador
   lo permite; en iOS muestra la instrucción "Compartir → Agregar a inicio".
-- **Iconos placeholder** (rayo lima sobre carbón) generados por `scripts/gen-icons.mjs`.
-  Para usar el **logo real del entrenador**: reemplaza los PNG en `public/icons/`
-  (`icon-192.png`, `icon-512.png`, `icon-512-maskable.png` con padding de seguridad) y
-  `public/apple-touch-icon.png` (180×180), o ajusta el polígono en el script y corre
-  `npm run gen:icons`.
+- **Iconos y logo** se generan desde `public/logo-source.png` con `npm run gen:icons`
+  (usa `sips`, nativo de macOS). Produce `public/icons/icon-192·512·512-maskable.png`,
+  `public/apple-touch-icon.png` (180×180) y `public/logo.png` (logo in-app del login,
+  header del portal y banner de instalación). Para cambiar el logo: reemplaza
+  `public/logo-source.png` (cuadrado) y corre `npm run gen:icons`.
 - La PWA se sirve sobre el build de producción. Verifica "Installable" con Lighthouse:
   ```bash
   npm run build && npm run preview   # abre la URL y corre Lighthouse → PWA → Installable
@@ -118,7 +118,7 @@ src/
   pages/    coach/ (login, atletas, detalle, rutinas, catálogo, agenda, chat)
             atleta/ (hoy, nutrición, progreso, chat)
 supabase/   migrations/0001_init.sql · seed.sql
-scripts/    gen-icons.mjs (iconos PWA placeholder)
+scripts/    gen-icons.sh (genera iconos PWA + logo desde public/logo-source.png)
 ```
 
 ## Fases de construcción

@@ -76,5 +76,5 @@ Sans neutra del sistema (`-apple-system, Segoe UI, Roboto…`).
 
 - Manifest `name: CoachPro`, `display: standalone`, `orientation: portrait`.
 - `theme_color` y `background_color` = `#0B0B0D` (splash y status bar integrados con el fondo).
-- Icono placeholder: rayo lima `#D8FF3E` sobre carbón `#0B0B0D`
-  (generado por [`scripts/gen-icons.mjs`](scripts/gen-icons.mjs); reemplazable por el logo real).
+- Logo de la app: imagen circular sobre fondo carbón `#0B0B0D` (`public/logo-source.png`).
+  Iconos y logo in-app generados con [`scripts/gen-icons.sh`](scripts/gen-icons.sh) (`npm run gen:icons`).

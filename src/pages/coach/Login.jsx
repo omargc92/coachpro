@@ -3,7 +3,7 @@
 // ============================================================
 import { useState } from 'react'
 import { useAuth } from '../../lib/auth.jsx'
-import { Screen, Card, Field, Button, Overline, Icon } from '../../lib/ui.jsx'
+import { Screen, Card, Field, Button, Overline } from '../../lib/ui.jsx'
 import { colors, space, font, radius } from '../../lib/theme.js'
 
 export function Login() {
@@ -30,20 +30,13 @@ export function Login() {
   return (
     <Screen style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', paddingBottom: space.md }}>
       <div style={{ textAlign: 'center', marginBottom: space.xl }}>
-        <div
-          style={{
-            width: 64,
-            height: 64,
-            borderRadius: 18,
-            background: colors.surface2,
-            border: `0.5px solid ${colors.border}`,
-            display: 'inline-flex',
-            alignItems: 'center',
-            justifyContent: 'center'
-          }}
-        >
-          <Icon name="bolt" size={34} color={colors.accent} />
-        </div>
+        <img
+          src="/logo.png"
+          alt="CoachPro"
+          width={88}
+          height={88}
+          style={{ borderRadius: '50%', display: 'block', margin: '0 auto' }}
+        />
         <h1 style={{ ...font.title, fontSize: 28, color: colors.title, margin: `${space.md}px 0 4px` }}>
           CoachPro
         </h1>
