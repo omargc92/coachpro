@@ -1,0 +1,744 @@
+// ============================================================
+// Hooks de datos (TanStack Query)
+//  - Coach: acceso directo a tablas (RLS por auth.uid)
+//  - Portal atleta: vía RPC portal_* (token)
+// Fase 1 cubre el perfil del coach; fases siguientes amplían.
+// ============================================================
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { supabase } from './supabase.js'
+import { scoreDia } from './score.js'
+
+// ---------- helpers de fecha (local, no UTC) ----------
+export function todayISO() {
+  const d = new Date()
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+export function isodowHoy() {
+  const dow = new Date().getDay() // 0=Dom..6=Sáb
+  return dow === 0 ? 7 : dow // 1=Lun..7=Dom
+}
+function semanasDesde(fecha) {
+  if (!fecha) return 0
+  const ms = Date.now() - new Date(fecha + 'T00:00:00').getTime()
+  return Math.max(1, Math.floor(ms / (1000 * 60 * 60 * 24 * 7)) + 1)
+}
+function diasDesde(fecha) {
+  if (!fecha) return null
+  const ms = Date.now() - new Date(fecha + 'T00:00:00').getTime()
+  return Math.floor(ms / (1000 * 60 * 60 * 24))
+}
+
+// ---------- COACH ----------
+
+// Devuelve la fila coaches del usuario autenticado, creándola si no existe.
+export function useCoach(user) {
+  return useQuery({
+    queryKey: ['coach', user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data: existing, error } = await supabase
+        .from('coaches')
+        .select('*')
+        .eq('auth_user_id', user.id)
+        .maybeSingle()
+      if (error) throw error
+      if (existing) return existing
+
+      // Primer login: crea la fila del coach.
+      const { data: created, error: e2 } = await supabase
+        .from('coaches')
+        .insert({
+          auth_user_id: user.id,
+          email: user.email,
+          nombre: user.email?.split('@')[0] || 'Entrenador'
+        })
+        .select('*')
+        .single()
+      if (e2) throw e2
+      return created
+    }
+  })
+}
+
+// Resumen de atletas con Score de Disciplina de HOY (para ordenar la lista).
+// Hace pocas consultas y agrega en el cliente (single-coach, pocos atletas).
+export function useAtletasResumen(coach) {
+  return useQuery({
+    queryKey: ['atletas-resumen', coach?.id],
+    enabled: !!coach,
+    queryFn: async () => {
+      const hoy = todayISO()
+      const dow = isodowHoy()
+      const desde = (() => {
+        const d = new Date()
+        d.setDate(d.getDate() - 30)
+        return d.toISOString().slice(0, 10)
+      })()
+
+      const [atletas, asignaciones, rutEjer, asisHoy, asisRec, sesHoy, objNut, comHoy] =
+        await Promise.all([
+          supabase.from('atletas').select('*').eq('activo', true).order('nombre'),
+          supabase.from('asignaciones').select('atleta_id, rutina_id, dia_semana, activa').eq('activa', true),
+          supabase.from('rutina_ejercicios').select('rutina_id, series'),
+          supabase.from('asistencias').select('atleta_id').eq('fecha', hoy),
+          supabase.from('asistencias').select('atleta_id, fecha').gte('fecha', desde),
+          supabase.from('sesiones').select('id, atleta_id, fecha').eq('fecha', hoy),
+          supabase.from('objetivos_nutricion').select('*').lte('vigente_desde', hoy).order('vigente_desde', { ascending: false }),
+          supabase.from('comidas').select('atleta_id, kcal, proteina_g').eq('fecha', hoy)
+        ])
+
+      for (const r of [atletas, asignaciones, rutEjer, asisHoy, asisRec, sesHoy, objNut, comHoy])
+        if (r.error) throw r.error
+
+      // series planeadas por rutina
+      const seriesPorRutina = {}
+      for (const re of rutEjer.data) seriesPorRutina[re.rutina_id] = (seriesPorRutina[re.rutina_id] || 0) + (re.series || 0)
+
+      // sets completados hoy por atleta
+      const sesIds = sesHoy.data.map((s) => s.id)
+      let setsPorAtleta = {}
+      if (sesIds.length) {
+        const sets = await supabase
+          .from('sesion_sets')
+          .select('sesion_id, completada')
+          .in('sesion_id', sesIds)
+        if (sets.error) throw sets.error
+        const sesAtleta = Object.fromEntries(sesHoy.data.map((s) => [s.id, s.atleta_id]))
+        for (const st of sets.data)
+          if (st.completada) setsPorAtleta[sesAtleta[st.sesion_id]] = (setsPorAtleta[sesAtleta[st.sesion_id]] || 0) + 1
+      }
+
+      const asistioHoySet = new Set(asisHoy.data.map((a) => a.atleta_id))
+      const sesionHoySet = new Set(sesHoy.data.map((s) => s.atleta_id))
+
+      // última actividad (asistencia o sesión) por atleta
+      const ultActividad = {}
+      for (const a of asisRec.data)
+        if (!ultActividad[a.atleta_id] || a.fecha > ultActividad[a.atleta_id]) ultActividad[a.atleta_id] = a.fecha
+      for (const s of sesHoy.data)
+        if (!ultActividad[s.atleta_id] || s.fecha > ultActividad[s.atleta_id]) ultActividad[s.atleta_id] = s.fecha
+
+      // objetivo vigente por atleta (ya ordenado desc → el primero gana)
+      const objPorAtleta = {}
+      for (const o of objNut.data) if (!objPorAtleta[o.atleta_id]) objPorAtleta[o.atleta_id] = o
+
+      // consumido hoy por atleta
+      const consumidoPorAtleta = {}
+      for (const c of comHoy.data) {
+        const acc = (consumidoPorAtleta[c.atleta_id] ||= { kcal: 0, proteina_g: 0 })
+        acc.kcal += c.kcal || 0
+        acc.proteina_g += c.proteina_g || 0
+      }
+
+      // asignación de hoy por atleta → series planeadas
+      const planPorAtleta = {}
+      for (const asg of asignaciones.data)
+        if (asg.dia_semana === dow) planPorAtleta[asg.atleta_id] = { rutina_id: asg.rutina_id }
+
+      return atletas.data
+        .map((at) => {
+          const plan = planPorAtleta[at.id]
+          const setsPlaneados = plan ? seriesPorRutina[plan.rutina_id] || 0 : 0
+          const asistioHoy = asistioHoySet.has(at.id) || sesionHoySet.has(at.id)
+          const score = scoreDia({
+            asistioHoy,
+            setsPlaneados,
+            setsHechos: setsPorAtleta[at.id] || 0,
+            objetivo: objPorAtleta[at.id] || null,
+            consumido: consumidoPorAtleta[at.id] || null
+          })
+          const ult = ultActividad[at.id] || null
+          const diasSin = ult ? diasDesde(ult) : diasDesde(at.fecha_inicio)
+          return {
+            ...at,
+            score: score.total,
+            asistioHoy,
+            tieneRutinaHoy: !!plan,
+            semana: semanasDesde(at.fecha_inicio),
+            diasSinRegistro: diasSin,
+            enRiesgo: (diasSin ?? 0) >= 3
+          }
+        })
+        .sort((a, b) => b.score - a.score)
+    }
+  })
+}
+
+export function useCrearAtleta(coach) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (datos) => {
+      const { data, error } = await supabase
+        .from('atletas')
+        .insert({ ...datos, coach_id: coach.id })
+        .select('*')
+        .single()
+      if (error) throw error
+      return data
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['atletas-resumen'] })
+  })
+}
+
+// ---------- DETALLE DE ATLETA ----------
+
+export function useAtleta(atletaId) {
+  return useQuery({
+    queryKey: ['atleta', atletaId],
+    enabled: !!atletaId,
+    queryFn: async () => {
+      const { data, error } = await supabase.from('atletas').select('*').eq('id', atletaId).single()
+      if (error) throw error
+      return data
+    }
+  })
+}
+
+export function useMediciones(atletaId) {
+  return useQuery({
+    queryKey: ['mediciones', atletaId],
+    enabled: !!atletaId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('mediciones')
+        .select('*')
+        .eq('atleta_id', atletaId)
+        .order('fecha')
+      if (error) throw error
+      return data
+    }
+  })
+}
+
+// Rutinas asignadas al atleta (con nombre y día).
+export function useAsignacionesAtleta(atletaId) {
+  return useQuery({
+    queryKey: ['asignaciones', atletaId],
+    enabled: !!atletaId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('asignaciones')
+        .select('id, dia_semana, activa, rutinas(id, nombre)')
+        .eq('atleta_id', atletaId)
+        .order('dia_semana')
+      if (error) throw error
+      return data
+    }
+  })
+}
+
+// Adherencia nutricional de hoy + asistencias recientes (para el detalle).
+export function useAtletaActividad(atletaId) {
+  return useQuery({
+    queryKey: ['atleta-actividad', atletaId],
+    enabled: !!atletaId,
+    queryFn: async () => {
+      const hoy = todayISO()
+      const [obj, com, asis] = await Promise.all([
+        supabase
+          .from('objetivos_nutricion')
+          .select('*')
+          .eq('atleta_id', atletaId)
+          .lte('vigente_desde', hoy)
+          .order('vigente_desde', { ascending: false })
+          .limit(1),
+        supabase.from('comidas').select('kcal, proteina_g, carbos_g, grasas_g').eq('atleta_id', atletaId).eq('fecha', hoy),
+        supabase.from('asistencias').select('fecha, presente').eq('atleta_id', atletaId).order('fecha', { ascending: false }).limit(14)
+      ])
+      for (const r of [obj, com, asis]) if (r.error) throw r.error
+      const consumido = com.data.reduce(
+        (a, c) => ({
+          kcal: a.kcal + (c.kcal || 0),
+          proteina_g: a.proteina_g + (c.proteina_g || 0),
+          carbos_g: a.carbos_g + (c.carbos_g || 0),
+          grasas_g: a.grasas_g + (c.grasas_g || 0)
+        }),
+        { kcal: 0, proteina_g: 0, carbos_g: 0, grasas_g: 0 }
+      )
+      return { objetivo: obj.data[0] || null, consumido, asistencias: asis.data }
+    }
+  })
+}
+
+// ---------- CATÁLOGO DE EJERCICIOS ----------
+
+export function useEjercicios(coach) {
+  return useQuery({
+    queryKey: ['ejercicios', coach?.id],
+    enabled: !!coach,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('ejercicios')
+        .select('*')
+        .order('grupo_muscular')
+        .order('nombre')
+      if (error) throw error
+      return data
+    }
+  })
+}
+
+export function useGuardarEjercicio(coach) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (ej) => {
+      if (ej.id) {
+        const { error } = await supabase
+          .from('ejercicios')
+          .update({ nombre: ej.nombre, grupo_muscular: ej.grupo_muscular, gif_url: ej.gif_url || null })
+          .eq('id', ej.id)
+        if (error) throw error
+      } else {
+        const { error } = await supabase
+          .from('ejercicios')
+          .insert({ coach_id: coach.id, nombre: ej.nombre, grupo_muscular: ej.grupo_muscular, gif_url: ej.gif_url || null })
+        if (error) throw error
+      }
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['ejercicios'] })
+  })
+}
+
+export function useEliminarEjercicio() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (id) => {
+      const { error } = await supabase.from('ejercicios').delete().eq('id', id)
+      if (error) throw error
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['ejercicios'] })
+  })
+}
+
+// ---------- RUTINAS (builder + asignación) ----------
+
+export function useRutinas(coach) {
+  return useQuery({
+    queryKey: ['rutinas', coach?.id],
+    enabled: !!coach,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('rutinas')
+        .select('*, rutina_ejercicios(id)')
+        .order('created_at', { ascending: false })
+      if (error) throw error
+      return data.map((r) => ({ ...r, num_ejercicios: r.rutina_ejercicios?.length || 0 }))
+    }
+  })
+}
+
+export function useRutinaDetalle(rutinaId) {
+  return useQuery({
+    queryKey: ['rutina', rutinaId],
+    enabled: !!rutinaId,
+    queryFn: async () => {
+      const [rut, ejers, asign] = await Promise.all([
+        supabase.from('rutinas').select('*').eq('id', rutinaId).single(),
+        supabase
+          .from('rutina_ejercicios')
+          .select('*, ejercicios(id, nombre, grupo_muscular)')
+          .eq('rutina_id', rutinaId)
+          .order('orden'),
+        supabase
+          .from('asignaciones')
+          .select('id, dia_semana, activa, atleta_id, atletas(nombre)')
+          .eq('rutina_id', rutinaId)
+          .order('dia_semana')
+      ])
+      for (const r of [rut, ejers, asign]) if (r.error) throw r.error
+      return { rutina: rut.data, ejercicios: ejers.data, asignaciones: asign.data }
+    }
+  })
+}
+
+export function useCrearRutina(coach) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ nombre, descripcion }) => {
+      const { data, error } = await supabase
+        .from('rutinas')
+        .insert({ coach_id: coach.id, nombre, descripcion: descripcion || null })
+        .select('*')
+        .single()
+      if (error) throw error
+      return data
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['rutinas'] })
+  })
+}
+
+export function useEliminarRutina() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (id) => {
+      const { error } = await supabase.from('rutinas').delete().eq('id', id)
+      if (error) throw error
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['rutinas'] })
+  })
+}
+
+// Operaciones sobre los ejercicios DE una rutina (invalidan ese detalle).
+function invalidarRutina(qc) {
+  qc.invalidateQueries({ queryKey: ['rutina'] })
+  qc.invalidateQueries({ queryKey: ['rutinas'] })
+}
+
+export function useAgregarEjercicioARutina(rutinaId) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ ejercicio_id, orden, series, reps, peso_kg, descanso_seg }) => {
+      const { error } = await supabase.from('rutina_ejercicios').insert({
+        rutina_id: rutinaId,
+        ejercicio_id,
+        orden: orden ?? 0,
+        series: series ?? 3,
+        reps: reps ?? 10,
+        peso_kg: peso_kg ?? null,
+        descanso_seg: descanso_seg ?? 90
+      })
+      if (error) throw error
+    },
+    onSuccess: () => invalidarRutina(qc)
+  })
+}
+
+export function useActualizarRutinaEjercicio() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ id, ...campos }) => {
+      const { error } = await supabase.from('rutina_ejercicios').update(campos).eq('id', id)
+      if (error) throw error
+    },
+    onSuccess: () => invalidarRutina(qc)
+  })
+}
+
+export function useEliminarRutinaEjercicio() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (id) => {
+      const { error } = await supabase.from('rutina_ejercicios').delete().eq('id', id)
+      if (error) throw error
+    },
+    onSuccess: () => invalidarRutina(qc)
+  })
+}
+
+// Reordenar: persiste el campo orden de una lista completa.
+export function useReordenarRutina() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (items) => {
+      // items: [{ id, orden }, ...]
+      for (const it of items) {
+        const { error } = await supabase.from('rutina_ejercicios').update({ orden: it.orden }).eq('id', it.id)
+        if (error) throw error
+      }
+    },
+    onSuccess: () => invalidarRutina(qc)
+  })
+}
+
+export function useAsignarRutina() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ atleta_id, rutina_id, dia_semana }) => {
+      const { error } = await supabase
+        .from('asignaciones')
+        .insert({ atleta_id, rutina_id, dia_semana, activa: true })
+      if (error) throw error
+    },
+    onSuccess: () => {
+      invalidarRutina(qc)
+      qc.invalidateQueries({ queryKey: ['atletas-resumen'] })
+      qc.invalidateQueries({ queryKey: ['asignaciones'] })
+    }
+  })
+}
+
+export function useQuitarAsignacion() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (id) => {
+      const { error } = await supabase.from('asignaciones').delete().eq('id', id)
+      if (error) throw error
+    },
+    onSuccess: () => {
+      invalidarRutina(qc)
+      qc.invalidateQueries({ queryKey: ['atletas-resumen'] })
+    }
+  })
+}
+
+// Lista ligera de atletas (para selects de asignación).
+export function useAtletasLista(coach) {
+  return useQuery({
+    queryKey: ['atletas-lista', coach?.id],
+    enabled: !!coach,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('atletas')
+        .select('id, nombre')
+        .eq('activo', true)
+        .order('nombre')
+      if (error) throw error
+      return data
+    }
+  })
+}
+
+// ---------- AGENDA (sesiones del día por atleta) ----------
+
+export function useAgenda(coach) {
+  return useQuery({
+    queryKey: ['agenda', coach?.id],
+    enabled: !!coach,
+    queryFn: async () => {
+      const hoy = todayISO()
+      const dow = isodowHoy()
+      const [atletas, asign, sesHoy] = await Promise.all([
+        supabase.from('atletas').select('id, nombre').eq('activo', true).order('nombre'),
+        supabase
+          .from('asignaciones')
+          .select('atleta_id, dia_semana, activa, rutinas(nombre)')
+          .eq('activa', true)
+          .eq('dia_semana', dow),
+        supabase.from('sesiones').select('id, atleta_id, completada').eq('fecha', hoy)
+      ])
+      for (const r of [atletas, asign, sesHoy]) if (r.error) throw r.error
+
+      const sesPorAtleta = {}
+      for (const s of sesHoy.data) sesPorAtleta[s.atleta_id] = s
+      const rutinaPorAtleta = {}
+      for (const a of asign.data) rutinaPorAtleta[a.atleta_id] = a.rutinas?.nombre || null
+
+      return atletas.data.map((at) => ({
+        ...at,
+        rutinaHoy: rutinaPorAtleta[at.id] || null,
+        sesion: sesPorAtleta[at.id] || null,
+        estado: !rutinaPorAtleta[at.id]
+          ? 'descanso'
+          : sesPorAtleta[at.id]?.completada
+            ? 'completada'
+            : sesPorAtleta[at.id]
+              ? 'en_curso'
+              : 'pendiente'
+      }))
+    }
+  })
+}
+
+// ---------- CHAT (coach) ----------
+
+export function useConversaciones(coach) {
+  return useQuery({
+    queryKey: ['conversaciones', coach?.id],
+    enabled: !!coach,
+    queryFn: async () => {
+      const [atletas, msgs] = await Promise.all([
+        supabase.from('atletas').select('id, nombre').eq('activo', true),
+        supabase.from('mensajes').select('*').order('created_at', { ascending: false })
+      ])
+      for (const r of [atletas, msgs]) if (r.error) throw r.error
+      const ultimo = {}
+      const noLeidos = {}
+      for (const m of msgs.data) {
+        if (!ultimo[m.atleta_id]) ultimo[m.atleta_id] = m
+        if (m.autor === 'atleta' && !m.leido) noLeidos[m.atleta_id] = (noLeidos[m.atleta_id] || 0) + 1
+      }
+      return atletas.data
+        .map((a) => ({ ...a, ultimo: ultimo[a.id] || null, noLeidos: noLeidos[a.id] || 0 }))
+        .sort((a, b) => (b.ultimo?.created_at || '').localeCompare(a.ultimo?.created_at || ''))
+    }
+  })
+}
+
+export function useHilo(atletaId) {
+  return useQuery({
+    queryKey: ['hilo', atletaId],
+    enabled: !!atletaId,
+    queryFn: async () => {
+      // marca como leídos los mensajes del atleta
+      await supabase.from('mensajes').update({ leido: true }).eq('atleta_id', atletaId).eq('autor', 'atleta').eq('leido', false)
+      const { data, error } = await supabase
+        .from('mensajes')
+        .select('*')
+        .eq('atleta_id', atletaId)
+        .order('created_at')
+      if (error) throw error
+      return data
+    }
+  })
+}
+
+export function useEnviarMensajeCoach(atletaId) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (texto) => {
+      const { error } = await supabase
+        .from('mensajes')
+        .insert({ atleta_id: atletaId, autor: 'coach', texto, leido: false })
+      if (error) throw error
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['hilo', atletaId] })
+      qc.invalidateQueries({ queryKey: ['conversaciones'] })
+    }
+  })
+}
+
+// ---------- PORTAL ATLETA (RPC) ----------
+
+export function usePerfilYRutina(token, fecha) {
+  return useQuery({
+    queryKey: ['portal', 'perfil', token, fecha],
+    enabled: !!token,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('portal_perfil_y_rutina', {
+        p_token: token,
+        p_fecha: fecha
+      })
+      if (error) throw error
+      return data
+    }
+  })
+}
+
+export function usePortalNutricion(token, fecha) {
+  return useQuery({
+    queryKey: ['portal', 'nutricion', token, fecha],
+    enabled: !!token,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('portal_nutricion', { p_token: token, p_fecha: fecha })
+      if (error) throw error
+      return data
+    }
+  })
+}
+
+export function useRegistrarSet(token) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (set) => {
+      const { data, error } = await supabase.rpc('portal_registrar_set', {
+        p_token: token,
+        p_ejercicio_id: set.ejercicio_id,
+        p_serie_num: set.serie_num,
+        p_reps: set.reps,
+        p_peso: set.peso,
+        p_rutina_id: set.rutina_id ?? null,
+        p_fecha: set.fecha
+      })
+      if (error) throw error
+      return data
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['portal'] })
+  })
+}
+
+export function useMarcarAsistencia(token) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (fecha) => {
+      const { error } = await supabase.rpc('portal_marcar_asistencia', { p_token: token, p_fecha: fecha })
+      if (error) throw error
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['portal'] })
+  })
+}
+
+export function usePortalSesionHoy(token, fecha) {
+  return useQuery({
+    queryKey: ['portal', 'sesion', token, fecha],
+    enabled: !!token,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('portal_sesion_hoy', { p_token: token, p_fecha: fecha })
+      if (error) throw error
+      return data
+    }
+  })
+}
+
+export function usePortalHistorial(token, dias = 30) {
+  return useQuery({
+    queryKey: ['portal', 'historial', token, dias],
+    enabled: !!token,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('portal_historial', { p_token: token, p_dias: dias })
+      if (error) throw error
+      return data
+    }
+  })
+}
+
+export function usePortalProgreso(token) {
+  return useQuery({
+    queryKey: ['portal', 'progreso', token],
+    enabled: !!token,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('portal_progreso', { p_token: token })
+      if (error) throw error
+      return data
+    }
+  })
+}
+
+export function useRegistrarComida(token) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (c) => {
+      const { data, error } = await supabase.rpc('portal_registrar_comida', {
+        p_token: token,
+        p_momento: c.momento,
+        p_descripcion: c.descripcion || null,
+        p_kcal: c.kcal || 0,
+        p_prot: c.proteina_g || 0,
+        p_carb: c.carbos_g || 0,
+        p_gra: c.grasas_g || 0,
+        p_foto_url: c.foto_url || null,
+        p_fecha: c.fecha
+      })
+      if (error) throw error
+      return data
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['portal'] })
+  })
+}
+
+export function usePortalMensajes(token) {
+  return useQuery({
+    queryKey: ['portal', 'mensajes', token],
+    enabled: !!token,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('portal_leer_mensajes', { p_token: token })
+      if (error) throw error
+      return data
+    },
+    refetchInterval: 15000
+  })
+}
+
+export function useEnviarMensajePortal(token) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (texto) => {
+      const { error } = await supabase.rpc('portal_enviar_mensaje', { p_token: token, p_texto: texto })
+      if (error) throw error
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['portal', 'mensajes', token] })
+  })
+}
+
+// Sube una foto al bucket 'fotos' y devuelve su URL pública.
+export async function subirFoto(file, carpeta = 'platos') {
+  const ext = (file.name?.split('.').pop() || 'jpg').toLowerCase()
+  const nombre = `${carpeta}/${crypto.randomUUID()}.${ext}`
+  const { error } = await supabase.storage.from('fotos').upload(nombre, file, {
+    cacheControl: '3600',
+    upsert: false
+  })
+  if (error) throw error
+  const { data } = supabase.storage.from('fotos').getPublicUrl(nombre)
+  return data.publicUrl
+}
