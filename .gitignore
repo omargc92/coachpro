@@ -7,3 +7,5 @@ dist-ssr
 .DS_Store
 .vercel
 dev-dist
+supabase/.temp
+supabase/.branches
