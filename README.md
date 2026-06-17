@@ -1,5 +1,7 @@
 # CoachPro
 
+[![QA (Playwright)](https://github.com/omargc92/coachpro/actions/workflows/qa.yml/badge.svg)](https://github.com/omargc92/coachpro/actions/workflows/qa.yml)
+
 App web **mobile-first** (PWA instalable) de coaching fitness para **un solo entrenador**
 que da seguimiento a sus clientes: rutinas, nutrición, asistencia al gym y progreso.
 
