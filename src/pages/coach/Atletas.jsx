@@ -76,24 +76,26 @@ export function Atletas({ coach, onOpenAtleta, onOpenCatalogo }) {
 function AtletaCard({ a, onClick }) {
   const col = scoreColor(a.score)
   return (
-    <Card onClick={onClick} style={{ display: 'flex', alignItems: 'center', gap: space.sm }}>
-      <Avatar nombre={a.nombre} />
+    <Card onClick={onClick} style={{ display: 'flex', alignItems: 'center', gap: space.md }}>
+      <Avatar nombre={a.nombre} size={46} color={colors.body} />
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-          <span style={{ ...font.body, fontWeight: 600, color: colors.title }}>{a.nombre}</span>
+          <span style={{ ...font.body, fontSize: 15.5, fontWeight: 700, color: colors.title, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+            {a.nombre}
+          </span>
           {a.enRiesgo && (
-            <Badge color={colors.danger}>
+            <Badge color={colors.danger} style={{ flexShrink: 0 }}>
               <Icon name="alert-triangle" size={11} /> {a.diasSinRegistro}d
             </Badge>
           )}
         </div>
-        <div style={{ ...font.small, color: colors.muted, marginTop: 2 }}>
+        <div style={{ ...font.small, color: colors.muted, marginTop: 3 }}>
           {OBJETIVO_LABEL[a.objetivo]} · Semana {a.semana}
         </div>
       </div>
-      <div style={{ textAlign: 'right' }}>
-        <div style={{ ...font.number, fontSize: 26, color: col }}>{a.score}</div>
-        <Overline style={{ fontSize: 9 }}>Score</Overline>
+      <div style={{ textAlign: 'right', flexShrink: 0 }}>
+        <div style={{ ...font.number, fontSize: 30, color: col, lineHeight: 1 }}>{a.score}</div>
+        <Overline style={{ fontSize: 9, marginTop: 2 }}>Score</Overline>
       </div>
     </Card>
   )

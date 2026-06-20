@@ -1,7 +1,7 @@
 // ============================================================
 // CoachPro — componentes UI compartidos (estilos 100% inline)
 // ============================================================
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { colors, radius, space, font, scoreColor } from './theme.js'
 
 // ---------- Icono (Tabler webfont) ----------
@@ -48,16 +48,31 @@ export function Overline({ children, color = colors.hint, style }) {
 
 // ---------- Card ----------
 export function Card({ children, onClick, style, accent }) {
+  const [pressed, setPressed] = useState(false)
+  const pressable = !!onClick
+  const pressHandlers = pressable
+    ? {
+        onPointerDown: () => setPressed(true),
+        onPointerUp: () => setPressed(false),
+        onPointerLeave: () => setPressed(false),
+        onPointerCancel: () => setPressed(false)
+      }
+    : {}
   return (
     <div
       onClick={onClick}
+      {...pressHandlers}
       style={{
         background: colors.surface2,
         border: `0.5px solid ${accent || colors.border}`,
         borderRadius: radius.lg,
         padding: space.md,
-        cursor: onClick ? 'pointer' : 'default',
-        ...style
+        cursor: pressable ? 'pointer' : 'default',
+        WebkitTapHighlightColor: 'transparent',
+        transition: pressable ? 'transform 120ms ease, background 120ms ease' : undefined,
+        ...style,
+        // Feedback de press para cards tappables (gana sobre style).
+        ...(pressed ? { transform: 'scale(0.985)', background: colors.border } : null)
       }}
     >
       {children}
@@ -236,7 +251,7 @@ export function Badge({ children, color = colors.danger, style }) {
 }
 
 // ---------- Anillo de progreso (Score protagonista) ----------
-export function Ring({ value, size = 200, stroke = 14, label, sublabel }) {
+export function Ring({ value, size = 200, stroke = 16, label, sublabel }) {
   const v = Math.max(0, Math.min(100, value || 0))
   const r = (size - stroke) / 2
   const c = 2 * Math.PI * r
@@ -255,6 +270,7 @@ export function Ring({ value, size = 200, stroke = 14, label, sublabel }) {
           strokeWidth={stroke}
           strokeLinecap="round"
           strokeDasharray={`${dash} ${c - dash}`}
+          style={{ filter: `drop-shadow(0 0 6px ${col}66)`, transition: 'stroke-dasharray 600ms ease' }}
         />
       </svg>
       <div
@@ -267,8 +283,8 @@ export function Ring({ value, size = 200, stroke = 14, label, sublabel }) {
           justifyContent: 'center'
         }}
       >
-        <div style={{ ...font.hero, fontSize: size * 0.32, color: col }}>{Math.round(v)}</div>
-        {label && <Overline style={{ marginTop: 4 }}>{label}</Overline>}
+        <div style={{ ...font.hero, fontSize: size * 0.34, color: col }}>{Math.round(v)}</div>
+        {label && <Overline style={{ marginTop: 6 }}>{label}</Overline>}
         {sublabel && <div style={{ ...font.small, color: colors.muted, marginTop: 2 }}>{sublabel}</div>}
       </div>
     </div>
@@ -316,7 +332,18 @@ export function Header({ title, subtitle, right, onBack }) {
       )}
       <div style={{ flex: 1, minWidth: 0 }}>
         {subtitle && <Overline color={colors.accent}>{subtitle}</Overline>}
-        <h1 style={{ ...font.title, fontSize: 24, color: colors.title, margin: '2px 0 0' }}>{title}</h1>
+        <h1
+          style={{
+            ...font.title,
+            fontSize: 25,
+            fontWeight: 700,
+            letterSpacing: '-0.02em',
+            color: colors.title,
+            margin: subtitle ? '3px 0 0' : 0
+          }}
+        >
+          {title}
+        </h1>
       </div>
       {right}
     </div>
@@ -358,17 +385,30 @@ export function BottomNav({ items, active, onChange }) {
               background: 'transparent',
               border: 'none',
               cursor: 'pointer',
-              padding: '10px 0 12px',
+              padding: '8px 0 10px',
               display: 'flex',
-              flexDirection: 'column',
               alignItems: 'center',
               justifyContent: 'center',
-              gap: 3,
-              color: on ? colors.accent : colors.hint
+              color: on ? colors.accent : colors.hint,
+              WebkitTapHighlightColor: 'transparent'
             }}
           >
-            <Icon name={it.icon} size={22} />
-            <span style={{ fontSize: 10.5, fontWeight: on ? 600 : 400 }}>{it.label}</span>
+            {/* Pill indicador del tab activo (lima sutil) + color lima ícono/label */}
+            <span
+              style={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                gap: 3,
+                padding: '6px 16px',
+                borderRadius: radius.pill,
+                background: on ? 'rgba(216,255,62,0.12)' : 'transparent',
+                transition: 'background 150ms ease'
+              }}
+            >
+              <Icon name={it.icon} size={22} />
+              <span style={{ fontSize: 10.5, fontWeight: on ? 600 : 400 }}>{it.label}</span>
+            </span>
           </button>
         )
       })}
@@ -417,11 +457,13 @@ export function Sheet({ open, onClose, title, children }) {
           boxSizing: 'border-box'
         }}
       >
+        {/* Handle visual de bottom-sheet */}
+        <div style={{ width: 36, height: 4, borderRadius: radius.pill, background: colors.border, margin: '-4px auto 14px' }} />
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: space.md }}>
-          <h2 style={{ ...font.title, color: colors.title, margin: 0 }}>{title}</h2>
+          <h2 style={{ ...font.title, fontSize: 21, fontWeight: 700, letterSpacing: '-0.01em', color: colors.title, margin: 0 }}>{title}</h2>
           <button
             onClick={onClose}
-            style={{ background: 'transparent', border: 'none', color: colors.muted, cursor: 'pointer' }}
+            style={{ background: 'transparent', border: 'none', color: colors.muted, cursor: 'pointer', padding: 0, lineHeight: 0 }}
           >
             <Icon name="x" size={24} />
           </button>
