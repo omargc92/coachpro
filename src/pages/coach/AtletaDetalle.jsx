@@ -78,13 +78,16 @@ export function AtletaDetalle({ atletaId, onBack }) {
         ))}
       </Card>
 
-      {/* --- Nutrición hoy --- */}
-      <Row style={{ alignItems: 'center', marginBottom: space.sm }}>
-        <Overline style={{ flex: 1 }}>Adherencia nutricional · hoy</Overline>
-        <Button variant="ghost" icon="adjustments" onClick={() => setEditObjetivo(true)} style={{ padding: '4px 8px' }}>
-          {act?.objetivo ? 'Editar metas' : 'Definir metas'}
-        </Button>
-      </Row>
+      {/* --- Nutrición hoy --- (título en su propia línea; acción apilada debajo) */}
+      <SeccionTitulo>Adherencia nutricional · hoy</SeccionTitulo>
+      <Button
+        variant="surface"
+        icon="adjustments"
+        onClick={() => setEditObjetivo(true)}
+        style={{ marginBottom: space.sm }}
+      >
+        {act?.objetivo ? 'Editar metas' : 'Definir metas'}
+      </Button>
       <Nutricion act={act} />
 
       {/* --- Asistencias --- */}
@@ -190,7 +193,7 @@ function Mediciones({ med }) {
 
       <div style={{ height: 150, marginLeft: -8 }}>
         <ResponsiveContainer width="100%" height="100%">
-          <LineChart data={data} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
+          <LineChart data={data} margin={{ top: 8, right: 18, bottom: 0, left: 6 }}>
             <XAxis dataKey="fecha" tick={{ fill: colors.hint, fontSize: 10 }} axisLine={false} tickLine={false} />
             <YAxis
               domain={['dataMin - 1', 'dataMax + 1']}

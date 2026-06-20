@@ -22,13 +22,16 @@ export function ChatThread({ mensajes, yo, onEnviar, enviando }) {
 
   return (
     <>
-      <div style={{ flex: 1, overflowY: 'auto', padding: `${space.sm}px ${space.md}px`, display: 'flex', flexDirection: 'column', gap: 8 }}>
-        {(!mensajes || mensajes.length === 0) && (
-          <div style={{ ...font.small, color: colors.muted, textAlign: 'center', marginTop: space.xl }}>
-            Aún no hay mensajes. Escribe el primero.
-          </div>
-        )}
-        {mensajes?.map((m) => {
+      <div style={{ flex: 1, overflowY: 'auto', padding: `${space.sm}px ${space.md}px`, display: 'flex', flexDirection: 'column' }}>
+        {/* marginTop:auto → las burbujas se anclan abajo cuando hay pocas, y crecen
+            hacia arriba; con muchas, el margen colapsa y scrollea normal. */}
+        <div style={{ marginTop: 'auto', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {(!mensajes || mensajes.length === 0) && (
+            <div style={{ ...font.small, color: colors.muted, textAlign: 'center' }}>
+              Aún no hay mensajes. Escribe el primero.
+            </div>
+          )}
+          {mensajes?.map((m) => {
           const mio = m.autor === yo
           return (
             <div key={m.id} style={{ display: 'flex', justifyContent: mio ? 'flex-end' : 'flex-start' }}>
@@ -51,7 +54,8 @@ export function ChatThread({ mensajes, yo, onEnviar, enviando }) {
             </div>
           )
         })}
-        <div ref={finRef} />
+          <div ref={finRef} />
+        </div>
       </div>
 
       <div

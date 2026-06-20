@@ -48,8 +48,30 @@ export function Rutinas({ coach }) {
       />
 
       {isLoading && <Loading />}
+
+      {/* Empty-state de onboarding cuando no hay rutinas */}
       {rutinas && rutinas.length === 0 && (
-        <Empty icon="barbell" title="Sin rutinas" hint="Crea tu primera rutina." action={<Button icon="plus" onClick={() => setNueva(true)}>Nueva rutina</Button>} />
+        <Card style={{ textAlign: 'center', padding: `${space.xl}px ${space.lg}px` }}>
+          <div
+            style={{
+              width: 64,
+              height: 64,
+              borderRadius: 18,
+              background: colors.surface,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              margin: `0 auto ${space.md}px`
+            }}
+          >
+            <Icon name="barbell" size={32} color={colors.accent} />
+          </div>
+          <div style={{ ...font.title, fontSize: 19, color: colors.title, marginBottom: 6 }}>Crea tu primera rutina</div>
+          <div style={{ ...font.small, color: colors.muted, maxWidth: 280, margin: `0 auto ${space.lg}px` }}>
+            Arma una rutina con ejercicios de tu catálogo y asígnala a tus atletas por día de la semana.
+          </div>
+          <Button icon="plus" onClick={() => setNueva(true)}>Nueva rutina</Button>
+        </Card>
       )}
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: space.sm }}>
@@ -66,6 +88,16 @@ export function Rutinas({ coach }) {
           </Card>
         ))}
       </div>
+
+      {/* Tip secundario: llena el espacio con sentido cuando ya hay rutinas */}
+      {rutinas && rutinas.length > 0 && (
+        <Card accent={colors.info} style={{ marginTop: space.md, display: 'flex', gap: space.sm, alignItems: 'flex-start' }}>
+          <Icon name="bulb" size={18} color={colors.info} style={{ marginTop: 1, flexShrink: 0 }} />
+          <div style={{ ...font.small, color: colors.body }}>
+            Abre una rutina para añadir ejercicios y <b style={{ color: colors.title }}>asignarla a un atleta</b> por día de la semana.
+          </div>
+        </Card>
+      )}
 
       <Sheet open={nueva} onClose={() => setNueva(false)} title="Nueva rutina">
         <Field label="Nombre" value={f.nombre} onChange={(v) => setF((p) => ({ ...p, nombre: v }))} placeholder="Ej. Full Body A" />

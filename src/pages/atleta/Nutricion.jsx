@@ -283,12 +283,10 @@ function BuscadorAlimentos({ onElegir, onCancelar }) {
   // Paso 1: búsqueda + lista.
   return (
     <>
-      <Row style={{ marginBottom: space.md }}>
-        <div style={{ flex: 1 }}>
-          <Field label="" value={q} onChange={setQ} onKeyDown={onKeyDown} placeholder="Ej. yogur griego" />
-        </div>
-        <Button icon="search" onClick={ejecutar} disabled={estado === 'cargando' || !q.trim()}>Buscar</Button>
-      </Row>
+      <Field label="" value={q} onChange={setQ} onKeyDown={onKeyDown} placeholder="Ej. yogur griego" />
+      <Button icon="search" onClick={ejecutar} disabled={estado === 'cargando' || !q.trim()} style={{ marginBottom: space.md }}>
+        Buscar
+      </Button>
 
       {estado === 'cargando' && <Loading label="Buscando…" />}
       {estado === 'error' && (

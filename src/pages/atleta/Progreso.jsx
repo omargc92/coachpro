@@ -81,7 +81,7 @@ export function Progreso({ token }) {
             </Row>
             <div style={{ height: 170, marginLeft: -8 }}>
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={serie} margin={{ top: 8, right: 8, bottom: 0, left: 0 }}>
+                <LineChart data={serie} margin={{ top: 8, right: 18, bottom: 0, left: 6 }}>
                   <XAxis dataKey="fecha" tick={{ fill: colors.hint, fontSize: 10 }} axisLine={false} tickLine={false} />
                   <YAxis domain={['dataMin - 1', 'dataMax + 1']} tick={{ fill: colors.hint, fontSize: 10 }} axisLine={false} tickLine={false} width={32} />
                   <Tooltip
