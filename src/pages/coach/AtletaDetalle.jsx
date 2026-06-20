@@ -105,38 +105,33 @@ export function AtletaDetalle({ atletaId, onBack }) {
         Abrir chat (Fase 4)
       </Button>
 
-      <ObjetivoSheet
-        open={editObjetivo}
-        onClose={() => setEditObjetivo(false)}
-        objetivo={act?.objetivo}
-        onGuardar={(metas) =>
-          guardarObjetivo.mutate(metas, { onSuccess: () => setEditObjetivo(false) })
-        }
-        guardando={guardarObjetivo.isPending}
-      />
+      {editObjetivo && (
+        <ObjetivoSheet
+          onClose={() => setEditObjetivo(false)}
+          objetivo={act?.objetivo}
+          onGuardar={(metas) =>
+            guardarObjetivo.mutate(metas, { onSuccess: () => setEditObjetivo(false) })
+          }
+          guardando={guardarObjetivo.isPending}
+        />
+      )}
     </Screen>
   )
 }
 
 // Sheet para que el coach defina/edite los macros objetivo del atleta.
-function ObjetivoSheet({ open, onClose, objetivo, onGuardar, guardando }) {
-  const inicial = () => ({
+// Se monta al abrir, así que el estado inicial sale del objetivo vigente.
+function ObjetivoSheet({ onClose, objetivo, onGuardar, guardando }) {
+  const [f, setF] = useState(() => ({
     kcal: objetivo?.kcal != null ? String(objetivo.kcal) : '',
     proteina_g: objetivo?.proteina_g != null ? String(objetivo.proteina_g) : '',
     carbos_g: objetivo?.carbos_g != null ? String(objetivo.carbos_g) : '',
     grasas_g: objetivo?.grasas_g != null ? String(objetivo.grasas_g) : ''
-  })
-  const [f, setF] = useState(inicial)
-  // Reinicia el formulario cada vez que se abre con un objetivo distinto.
-  const [abiertoCon, setAbiertoCon] = useState(null)
-  if (open && abiertoCon !== objetivo) {
-    setAbiertoCon(objetivo)
-    setF(inicial())
-  }
+  }))
   const set = (k) => (v) => setF((p) => ({ ...p, [k]: v }))
 
   return (
-    <Sheet open={open} onClose={onClose} title="Objetivos de nutrición">
+    <Sheet open onClose={onClose} title="Objetivos de nutrición">
       <div style={{ ...font.small, color: colors.hint, marginBottom: space.md }}>
         Metas diarias del atleta. Aplican desde hoy.
       </div>

@@ -66,32 +66,27 @@ export function Catalogo({ coach }) {
         </div>
       ))}
 
-      <EjercicioSheet
-        open={editar !== null}
-        ejercicio={editar}
-        onClose={() => setEditar(null)}
-        coach={coach}
-      />
+      {editar !== null && (
+        <EjercicioSheet
+          ejercicio={editar}
+          onClose={() => setEditar(null)}
+          coach={coach}
+        />
+      )}
     </Screen>
   )
 }
 
-function EjercicioSheet({ open, ejercicio, onClose, coach }) {
+function EjercicioSheet({ ejercicio, onClose, coach }) {
   const guardar = useGuardarEjercicio(coach)
   const eliminar = useEliminarEjercicio()
   const editando = ejercicio?.id
-  const [f, setF] = useState({ nombre: '', grupo_muscular: 'Pecho', gif_url: '' })
-  const [key, setKey] = useState(null)
-
-  // Re-sincroniza el formulario cuando cambia el ejercicio abierto.
-  if (open && key !== (ejercicio?.id || 'nuevo')) {
-    setKey(ejercicio?.id || 'nuevo')
-    setF({
-      nombre: ejercicio?.nombre || '',
-      grupo_muscular: ejercicio?.grupo_muscular || 'Pecho',
-      gif_url: ejercicio?.gif_url || ''
-    })
-  }
+  // Se monta al abrir, así que el estado inicial sale del ejercicio (sin setState en render).
+  const [f, setF] = useState(() => ({
+    nombre: ejercicio?.nombre || '',
+    grupo_muscular: ejercicio?.grupo_muscular || 'Pecho',
+    gif_url: ejercicio?.gif_url || ''
+  }))
   const set = (k) => (v) => setF((p) => ({ ...p, [k]: v }))
 
   async function onGuardar() {
@@ -106,7 +101,7 @@ function EjercicioSheet({ open, ejercicio, onClose, coach }) {
   }
 
   return (
-    <Sheet open={open} onClose={onClose} title={editando ? 'Editar ejercicio' : 'Nuevo ejercicio'}>
+    <Sheet open onClose={onClose} title={editando ? 'Editar ejercicio' : 'Nuevo ejercicio'}>
       <Field label="Nombre" value={f.nombre} onChange={set('nombre')} placeholder="Ej. Press inclinado" />
       <Select label="Grupo muscular" value={f.grupo_muscular} onChange={set('grupo_muscular')} options={GRUPOS} />
       <Field label="GIF / imagen (URL)" value={f.gif_url} onChange={set('gif_url')} placeholder="Opcional" />

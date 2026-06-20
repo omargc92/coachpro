@@ -186,13 +186,14 @@ export function Hoy({ token, onIrNutricion }) {
         </Button>
       </Row>
 
-      <RegistrarSerieSheet
-        open={registrarOpen}
-        onClose={() => setRegistrarOpen(false)}
-        rutina={rutina}
-        hechosPorEj={hechosPorEj}
-        onRegistrar={(payload) => registrar.mutate({ ...payload, rutina_id: rutina.rutina_id, fecha: hoy })}
-      />
+      {registrarOpen && (
+        <RegistrarSerieSheet
+          onClose={() => setRegistrarOpen(false)}
+          rutina={rutina}
+          hechosPorEj={hechosPorEj}
+          onRegistrar={(payload) => registrar.mutate({ ...payload, rutina_id: rutina.rutina_id, fecha: hoy })}
+        />
+      )}
     </>
   )
 }
@@ -207,14 +208,15 @@ function MiniStat({ icon, color, label, value }) {
   )
 }
 
-function RegistrarSerieSheet({ open, onClose, rutina, hechosPorEj, onRegistrar }) {
-  const [f, setF] = useState({ ejercicio_id: '', reps: '', peso: '' })
+function RegistrarSerieSheet({ onClose, rutina, hechosPorEj, onRegistrar }) {
   const opts = (rutina?.ejercicios || []).map((e) => ({ value: e.ejercicio_id, label: e.nombre }))
-
-  if (open && !f.ejercicio_id && opts.length) {
-    const first = rutina.ejercicios[0]
-    setF({ ejercicio_id: first.ejercicio_id, reps: String(first.reps), peso: first.peso_kg != null ? String(first.peso_kg) : '' })
-  }
+  // Se monta al abrir: arranca con el primer ejercicio de la rutina.
+  const [f, setF] = useState(() => {
+    const first = rutina?.ejercicios?.[0]
+    return first
+      ? { ejercicio_id: first.ejercicio_id, reps: String(first.reps), peso: first.peso_kg != null ? String(first.peso_kg) : '' }
+      : { ejercicio_id: '', reps: '', peso: '' }
+  })
 
   const ejSel = rutina?.ejercicios?.find((e) => e.ejercicio_id === f.ejercicio_id)
 
@@ -236,7 +238,7 @@ function RegistrarSerieSheet({ open, onClose, rutina, hechosPorEj, onRegistrar }
   }
 
   return (
-    <Sheet open={open} onClose={onClose} title="Registrar serie">
+    <Sheet open onClose={onClose} title="Registrar serie">
       {opts.length === 0 ? (
         <div style={{ ...font.small, color: colors.muted }}>No hay rutina hoy.</div>
       ) : (

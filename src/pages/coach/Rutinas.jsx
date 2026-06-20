@@ -175,36 +175,38 @@ function RutinaBuilder({ coach, rutinaId, onBack }) {
 
       <Button variant="danger" icon="trash" onClick={onBorrarRutina}>Eliminar rutina</Button>
 
-      {/* Sheets */}
-      <AgregarEjercicioSheet
-        open={addOpen}
-        onClose={() => setAddOpen(false)}
-        catalogo={catalogo || []}
-        orden={ejercicios.length + 1}
-        onAdd={(payload) => agregar.mutate(payload)}
-      />
-      <EditarEjercicioSheet
-        open={!!editEj}
-        ejercicio={editEj}
-        onClose={() => setEditEj(null)}
-        onSave={(campos) => actualizar.mutate({ id: editEj.id, ...campos })}
-      />
-      <AsignarSheet
-        open={asignOpen}
-        onClose={() => setAsignOpen(false)}
-        atletas={atletas || []}
-        rutinaId={rutinaId}
-        onAsignar={(payload) => asignar.mutate(payload)}
-      />
+      {/* Sheets (montaje condicional → estado fresco en cada apertura) */}
+      {addOpen && (
+        <AgregarEjercicioSheet
+          onClose={() => setAddOpen(false)}
+          catalogo={catalogo || []}
+          orden={ejercicios.length + 1}
+          onAdd={(payload) => agregar.mutate(payload)}
+        />
+      )}
+      {editEj && (
+        <EditarEjercicioSheet
+          ejercicio={editEj}
+          onClose={() => setEditEj(null)}
+          onSave={(campos) => actualizar.mutate({ id: editEj.id, ...campos })}
+        />
+      )}
+      {asignOpen && (
+        <AsignarSheet
+          onClose={() => setAsignOpen(false)}
+          atletas={atletas || []}
+          rutinaId={rutinaId}
+          onAsignar={(payload) => asignar.mutate(payload)}
+        />
+      )}
     </Screen>
   )
 }
 
-function AgregarEjercicioSheet({ open, onClose, catalogo, orden, onAdd }) {
-  const [f, setF] = useState({ ejercicio_id: '', series: '3', reps: '10', peso_kg: '', descanso_seg: '90' })
+function AgregarEjercicioSheet({ onClose, catalogo, orden, onAdd }) {
   const opts = catalogo.map((e) => ({ value: e.id, label: `${e.nombre} (${e.grupo_muscular})` }))
-  // inicializa el primer ejercicio del catálogo
-  if (open && !f.ejercicio_id && opts.length) setF((p) => ({ ...p, ejercicio_id: opts[0].value }))
+  // Se monta al abrir: arranca con el primer ejercicio del catálogo.
+  const [f, setF] = useState(() => ({ ejercicio_id: opts[0]?.value || '', series: '3', reps: '10', peso_kg: '', descanso_seg: '90' }))
 
   function guardar() {
     if (!f.ejercicio_id) return
@@ -216,12 +218,11 @@ function AgregarEjercicioSheet({ open, onClose, catalogo, orden, onAdd }) {
       peso_kg: f.peso_kg ? Number(f.peso_kg) : null,
       descanso_seg: Number(f.descanso_seg) || 90
     })
-    setF({ ejercicio_id: '', series: '3', reps: '10', peso_kg: '', descanso_seg: '90' })
     onClose()
   }
 
   return (
-    <Sheet open={open} onClose={onClose} title="Agregar ejercicio">
+    <Sheet open onClose={onClose} title="Agregar ejercicio">
       {opts.length === 0 ? (
         <div style={{ ...font.small, color: colors.muted }}>Tu catálogo está vacío. Agrega ejercicios primero.</div>
       ) : (
@@ -242,19 +243,14 @@ function AgregarEjercicioSheet({ open, onClose, catalogo, orden, onAdd }) {
   )
 }
 
-function EditarEjercicioSheet({ open, ejercicio, onClose, onSave }) {
-  const [f, setF] = useState(null)
-  const [key, setKey] = useState(null)
-  if (open && ejercicio && key !== ejercicio.id) {
-    setKey(ejercicio.id)
-    setF({
-      series: String(ejercicio.series),
-      reps: String(ejercicio.reps),
-      peso_kg: ejercicio.peso_kg != null ? String(ejercicio.peso_kg) : '',
-      descanso_seg: String(ejercicio.descanso_seg)
-    })
-  }
-  if (!f) return <Sheet open={open} onClose={onClose} title="Editar ejercicio" />
+function EditarEjercicioSheet({ ejercicio, onClose, onSave }) {
+  // Se monta al abrir con un ejercicio concreto: estado inicial directo de sus props.
+  const [f, setF] = useState(() => ({
+    series: String(ejercicio.series),
+    reps: String(ejercicio.reps),
+    peso_kg: ejercicio.peso_kg != null ? String(ejercicio.peso_kg) : '',
+    descanso_seg: String(ejercicio.descanso_seg)
+  }))
 
   function guardar() {
     onSave({
@@ -266,7 +262,7 @@ function EditarEjercicioSheet({ open, ejercicio, onClose, onSave }) {
     onClose()
   }
   return (
-    <Sheet open={open} onClose={onClose} title={ejercicio?.ejercicios?.nombre || 'Editar'}>
+    <Sheet open onClose={onClose} title={ejercicio?.ejercicios?.nombre || 'Editar'}>
       <Row>
         <div style={{ flex: 1 }}><Field label="Series" type="number" value={f.series} onChange={(v) => setF((p) => ({ ...p, series: v }))} /></div>
         <div style={{ flex: 1 }}><Field label="Reps" type="number" value={f.reps} onChange={(v) => setF((p) => ({ ...p, reps: v }))} /></div>
@@ -280,10 +276,10 @@ function EditarEjercicioSheet({ open, ejercicio, onClose, onSave }) {
   )
 }
 
-function AsignarSheet({ open, onClose, atletas, rutinaId, onAsignar }) {
-  const [f, setF] = useState({ atleta_id: '', dia_semana: '1' })
+function AsignarSheet({ onClose, atletas, rutinaId, onAsignar }) {
   const opts = atletas.map((a) => ({ value: a.id, label: a.nombre }))
-  if (open && !f.atleta_id && opts.length) setF((p) => ({ ...p, atleta_id: opts[0].value }))
+  // Se monta al abrir: preselecciona el primer atleta.
+  const [f, setF] = useState(() => ({ atleta_id: opts[0]?.value || '', dia_semana: '1' }))
 
   function guardar() {
     if (!f.atleta_id) return
@@ -291,7 +287,7 @@ function AsignarSheet({ open, onClose, atletas, rutinaId, onAsignar }) {
     onClose()
   }
   return (
-    <Sheet open={open} onClose={onClose} title="Asignar rutina">
+    <Sheet open onClose={onClose} title="Asignar rutina">
       {opts.length === 0 ? (
         <div style={{ ...font.small, color: colors.muted }}>No tienes atletas todavía.</div>
       ) : (

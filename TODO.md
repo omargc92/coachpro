@@ -23,9 +23,10 @@ secrets con fallback al default demo, así que rotar no rompe nada. Pendiente de
   (hoy se asume bucket público y URL directa).
 
 ## 🧱 Calidad de código
-- [ ] Refactorizar los `setState` en **fase de render** de los sheets
-  (`Rutinas`, `Catalogo`, `Hoy/RegistrarSerieSheet`, `AsignarSheet`) a `useEffect`.
-  Funcionan y convergen, pero es un anti-patrón frágil.
+- [x] Eliminado el `setState` en **fase de render** de todos los sheets
+  (`Rutinas`, `Catalogo`, `Hoy/RegistrarSerieSheet`, `AsignarSheet`, `ObjetivoSheet`).
+  Solución: **montaje condicional** (`{open && <Sheet/>}`) + estado inicial en
+  `useState(() => …)`. Más limpio que `useEffect` (sin render extra ni flash de datos viejos).
 
 ## ⚙️ CI / mantenimiento
 - [ ] Silenciar el warning de **Node 20** en Actions (`actions/*@v4`): optar por Node 24
