@@ -29,8 +29,8 @@ secrets con fallback al default demo, así que rotar no rompe nada. Pendiente de
   `useState(() => …)`. Más limpio que `useEffect` (sin render extra ni flash de datos viejos).
 
 ## ⚙️ CI / mantenimiento
-- [ ] Silenciar el warning de **Node 20** en Actions (`actions/*@v4`): optar por Node 24
-  (`FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true`) o esperar a que GitHub lo migre.
+- [x] Silenciado el warning de **Node 20** en Actions con
+  `FORCE_JAVASCRIPT_ACTIONS_TO_NODE24=true` a nivel de workflow.
 - [ ] (Opcional) Correr el QA también en **deploys de preview**, no solo producción.
 
 ## 🎨 Diseño (opcional)

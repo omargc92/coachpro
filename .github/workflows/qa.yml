@@ -15,6 +15,11 @@ on:
 permissions:
   contents: read
 
+# Fuerza las actions JS (actions/*@v4) a correr en Node 24 y silencia el
+# warning de deprecación de Node 20 en el runner.
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: 'true'
+
 jobs:
   qa:
     # Solo en deploys de producción exitosos, o ejecución manual.
