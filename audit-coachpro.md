@@ -6,6 +6,10 @@
 
 **Errores JS durante todo el recorrido:** `0`.
 
+**Todas las capturas en una sola imagen:** [`audit/_all-screenshots.png`](audit/_all-screenshots.png) (contact sheet de las 13 pantallas × 2 anchos).
+
+![contact sheet](audit/_all-screenshots.png)
+
 ---
 
 ## Hallazgos globales
