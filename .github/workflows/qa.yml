@@ -22,11 +22,13 @@ env:
 
 jobs:
   qa:
-    # Solo en deploys de producción exitosos, o ejecución manual.
+    # En cualquier deploy exitoso (producción O preview), o ejecución manual.
+    # El QA prueba environment_url, que Vercel rellena tanto en prod como en preview.
+    # Nota: si activas "Deployment Protection" en Vercel, las URLs de preview quedan
+    # tras auth y el QA fallaría; ahí conviene volver a restringir a Production.
     if: >-
       github.event_name == 'workflow_dispatch' ||
-      (github.event.deployment_status.state == 'success' &&
-       contains(github.event.deployment_status.environment, 'Production'))
+      github.event.deployment_status.state == 'success'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
