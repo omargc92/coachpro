@@ -8,6 +8,7 @@
 //
 // Variables (con defaults de la demo):
 //   QA_URL, QA_COACH_EMAIL, QA_COACH_PASS, QA_TOKEN
+// Para rotar credenciales sin romper nada, ver SECURITY.md (runbook).
 // ============================================================
 import { chromium } from 'playwright'
 import { mkdirSync, rmSync } from 'node:fs'

@@ -4,12 +4,11 @@ Lista viva de cosas a mejorar. El repo es **público** y la demo se deja **abier
 por ahora; los puntos de seguridad de abajo son para cuando se quiera blindar.
 
 ## 🔐 Seguridad / demo (repo público)
-- [ ] **Rotar credenciales demo expuestas en el repo** (`README.md`, `QA.md`, `qa/run.mjs`):
-  - Cambiar la contraseña del coach (`coach@coachpro.app` / `CoachPro-2026`).
-  - Regenerar los tokens de portal de los atletas: `update atletas set token = gen_random_uuid();`
-- [ ] **Mover credenciales a GitHub Secrets** (el workflow ya soporta `QA_COACH_EMAIL/PASS/TOKEN`)
-  y dejar solo placeholders en los archivos versionados.
-- [ ] Considerar un **proyecto Supabase separado solo para la demo pública**, aislado de datos reales.
+Runbook completo de rotación en **[SECURITY.md](SECURITY.md)**. El código ya soporta
+secrets con fallback al default demo, así que rotar no rompe nada. Pendiente de ejecutar:
+- [ ] **Rotar credenciales demo** (pass del coach + tokens de atletas) — requiere acceso a Supabase.
+- [ ] **Crear los GitHub Secrets** `QA_COACH_EMAIL/PASS/TOKEN` — requiere ajustes del repo.
+- [ ] (Opcional) **Proyecto Supabase separado solo para la demo pública**, aislado de datos reales.
 
 ## ✨ Funcionalidad (stubs ya marcados en el código)
 - [x] **Búsqueda de alimentos** en Nutrición: integrada con Open Food Facts
