@@ -21,8 +21,10 @@ const SHOTS = resolve(HERE, 'screenshots')
 const CFG = {
   url: (process.env.QA_URL || 'https://coachpro-livid.vercel.app').replace(/\/$/, ''),
   email: process.env.QA_COACH_EMAIL || 'coach@coachpro.app',
-  pass: process.env.QA_COACH_PASS || 'CoachPro-2026',
-  token: process.env.QA_TOKEN || 'ed866fae-d554-44b6-a98b-0df2c329e307'
+  // Credenciales rotadas → ya no van en el repo. En CI vienen de GitHub Secrets;
+  // en local expórtalas: QA_COACH_PASS=… QA_TOKEN=… npm run qa  (ver SECURITY.md).
+  pass: process.env.QA_COACH_PASS || '',
+  token: process.env.QA_TOKEN || ''
 }
 
 // ---------- estado del reporte ----------

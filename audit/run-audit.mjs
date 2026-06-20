@@ -11,8 +11,8 @@ import { fileURLToPath } from 'node:url'
 const HERE = dirname(fileURLToPath(import.meta.url))
 const URL = (process.env.AUDIT_URL || 'http://localhost:5173').replace(/\/$/, '')
 const EMAIL = process.env.QA_COACH_EMAIL || 'coach@coachpro.app'
-const PASS = process.env.QA_COACH_PASS || 'CoachPro-2026'
-const TOKEN = process.env.QA_TOKEN || 'ed866fae-d554-44b6-a98b-0df2c329e307'
+const PASS = process.env.QA_COACH_PASS || '' // rotado; exporta la var para correr local
+const TOKEN = process.env.QA_TOKEN || ''
 const WIDTHS = [390, 360]
 const H = 844
 

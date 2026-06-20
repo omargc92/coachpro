@@ -1,10 +1,11 @@
 # 📋 Checklist de QA — CoachPro
 
 **App:** https://coachpro-livid.vercel.app
-**Coach:** `coach@coachpro.app` / `CoachPro-2026`
-**Atleta (Ana):** `/?token=ed866fae-d554-44b6-a98b-0df2c329e307`
-**Atleta (Luis):** `/?token=d9faa07a-bd14-4676-88b6-b0b13e7c4fd1`
-**Atleta (Marta):** `/?token=52751f5a-6c82-495a-aa4f-f713153e8134`
+
+> 🔐 **Credenciales rotadas** — ya no van en el repo. Viven en **GitHub Secrets**
+> (`QA_COACH_EMAIL` / `QA_COACH_PASS` / `QA_TOKEN`); el QA en CI las usa solo.
+> Para correr el QA local, expórtalas como variables de entorno (ver [SECURITY.md](SECURITY.md)).
+> Email del coach: `coach@coachpro.app`; pass y tokens de atletas se entregan aparte.
 
 > ⚠️ **Dependencia de fecha:** El Score y la rutina del día dependen del día de la semana. La rutina *Full Body A* está asignada a **Lun/Mié/Vie**. En Mar/Jue/Sáb/Dom **no hay rutina** → el portal "Hoy" muestra "Día de descanso" y el sub-score de rutina no penaliza (sube el Score). Anota qué día corres el QA.
 >

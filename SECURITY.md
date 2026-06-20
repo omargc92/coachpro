@@ -1,18 +1,21 @@
 # Seguridad / runbook de rotación
 
-Este repo es **público** y la demo se deja **abierta a propósito**. Las credenciales
-demo están versionadas como *defaults* para que el QA y la demo funcionen sin secrets:
+Este repo es **público**. Las credenciales demo fueron **rotadas y blindadas**:
+ya **no** están en el código. Viven solo en **GitHub Secrets** y el QA (CI) las usa
+desde ahí.
 
-| Credencial | Dónde aparece | Valor demo actual |
+| Credencial | Dónde vive ahora | En el repo |
 |---|---|---|
-| Email coach | `qa/run.mjs`, `.github/workflows/qa.yml`, `QA.md` | `coach@coachpro.app` |
-| Pass coach | idem | `CoachPro-2026` |
-| Token atleta (Ana) | idem | `ed866fae-…` |
+| Email coach | Secret `QA_COACH_EMAIL` (y default `coach@coachpro.app`) | visible (no sensible) |
+| Pass coach | Secret `QA_COACH_PASS` | placeholder vacío |
+| Tokens de atletas | Secret `QA_TOKEN` (Ana) | placeholder vacío |
 
-El código ya está preparado para **secrets**: tanto `qa/run.mjs` (`process.env.QA_*`)
-como el workflow (`secrets.QA_* || default`) usan los valores reales si existen, y caen
-al default demo si no. Por eso rotar **no rompe nada**: en cuanto definas los secrets,
-se usan solos.
+`qa/run.mjs` y el workflow usan `process.env.QA_*` / `secrets.QA_*`. Para correr el QA
+**local** hay que exportar las variables (`QA_COACH_PASS=… QA_TOKEN=… npm run qa`).
+La demo pública dejó de ser logueable por visitantes anónimos (es lo buscado al blindar).
+
+> El script `scripts/rotar-credenciales.mjs` permite **volver a rotar** cuando se quiera
+> (lee `SUPABASE_SERVICE_ROLE_KEY` / `NEW_COACH_PASS` de entorno o de `.env.local`).
 
 ---
 

@@ -29,8 +29,8 @@ QA_URL=http://localhost:4173 npm run qa
 |---|---|
 | `QA_URL` | `https://coachpro-livid.vercel.app` |
 | `QA_COACH_EMAIL` | `coach@coachpro.app` |
-| `QA_COACH_PASS` | `CoachPro-2026` |
-| `QA_TOKEN` | token del portal de Ana |
+| `QA_COACH_PASS` | (GitHub Secrets — rotada, no va en el repo) |
+| `QA_TOKEN` | (GitHub Secrets — token del portal de Ana) |
 
 ## Qué prueba
 Arranque (monta React, env vars presentes), login del coach, home con stats y scores,

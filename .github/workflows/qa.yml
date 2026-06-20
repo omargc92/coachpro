@@ -51,10 +51,10 @@ jobs:
         env:
           QA_BROWSER: chromium
           QA_URL: ${{ github.event.deployment_status.environment_url || github.event.inputs.url || 'https://coachpro-livid.vercel.app' }}
-          # Credenciales demo (override con secrets si las rotas):
+          # Credenciales rotadas: viven solo en GitHub Secrets (Settings → Secrets).
           QA_COACH_EMAIL: ${{ secrets.QA_COACH_EMAIL || 'coach@coachpro.app' }}
-          QA_COACH_PASS: ${{ secrets.QA_COACH_PASS || 'CoachPro-2026' }}
-          QA_TOKEN: ${{ secrets.QA_TOKEN || 'ed866fae-d554-44b6-a98b-0df2c329e307' }}
+          QA_COACH_PASS: ${{ secrets.QA_COACH_PASS }}
+          QA_TOKEN: ${{ secrets.QA_TOKEN }}
         run: npm run qa
 
       - name: Subir capturas
