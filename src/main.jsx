@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { AuthProvider } from './lib/auth.jsx'
 import { ErrorBoundary } from './lib/ErrorBoundary.jsx'
+import { ReloadPrompt } from './lib/pwa.jsx'
 import App from './App.jsx'
 
 // Confirma la PRESENCIA (no el valor) de las env vars de Supabase al arrancar.
@@ -26,6 +27,7 @@ createRoot(document.getElementById('root')).render(
           <App />
         </AuthProvider>
       </QueryClientProvider>
+      <ReloadPrompt />
     </ErrorBoundary>
   </React.StrictMode>
 )

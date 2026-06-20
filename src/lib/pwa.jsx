@@ -1,11 +1,78 @@
 // ============================================================
 // PWA — hook de instalación + banner discreto (portal atleta)
+//       + aviso de actualización (service worker en modo 'prompt')
 // ============================================================
 import { useEffect, useState } from 'react'
+import { useRegisterSW } from 'virtual:pwa-register/react'
 import { colors, radius, space, font } from './theme.js'
 import { Icon } from './ui.jsx'
 
 const DISMISS_KEY = 'coachpro_install_dismissed'
+
+// Aviso "Nueva versión disponible". Con registerType:'prompt' el SW nuevo
+// queda en espera; al tocar "Actualizar" llamamos updateServiceWorker(true)
+// (skipWaiting + recarga controlada). Nunca recarga solo → sin loops/cuelgues.
+export function ReloadPrompt() {
+  const {
+    needRefresh: [needRefresh],
+    updateServiceWorker
+  } = useRegisterSW({
+    onRegisterError(err) {
+      console.error('[CoachPro] registro del service worker falló:', err)
+    }
+  })
+
+  if (!needRefresh) return null
+
+  return (
+    <div
+      style={{
+        position: 'fixed',
+        top: 'calc(env(safe-area-inset-top) + 8px)',
+        left: 8,
+        right: 8,
+        zIndex: 100,
+        display: 'flex',
+        justifyContent: 'center',
+        pointerEvents: 'none'
+      }}
+    >
+      <div
+        style={{
+          pointerEvents: 'auto',
+          display: 'flex',
+          alignItems: 'center',
+          gap: space.sm,
+          width: '100%',
+          maxWidth: 520,
+          background: colors.surface2,
+          border: `0.5px solid ${colors.border}`,
+          borderRadius: radius.md,
+          padding: '10px 12px',
+          boxShadow: '0 6px 24px rgba(0,0,0,0.5)'
+        }}
+      >
+        <Icon name="refresh" size={18} color={colors.accent} />
+        <span style={{ ...font.small, color: colors.title, flex: 1 }}>Nueva versión disponible</span>
+        <button
+          onClick={() => updateServiceWorker(true)}
+          style={{
+            background: colors.accent,
+            color: colors.accentInk,
+            border: 'none',
+            borderRadius: radius.sm,
+            padding: '8px 14px',
+            fontWeight: 600,
+            fontSize: 13,
+            cursor: 'pointer'
+          }}
+        >
+          Actualizar
+        </button>
+      </div>
+    </div>
+  )
+}
 
 function isIOS() {
   return /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream
