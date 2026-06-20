@@ -20,7 +20,9 @@ function fromEnvFile(key) {
   try {
     const txt = readFileSync(new URL('../.env.local', import.meta.url), 'utf8')
     const line = txt.split('\n').find((l) => l.startsWith(key + '='))
-    return line ? line.slice(key.length + 1).trim() : null
+    if (!line) return null
+    // quita comillas envolventes (".env.local" suele guardar valores entre comillas)
+    return line.slice(key.length + 1).trim().replace(/^['"]|['"]$/g, '')
   } catch {
     return null
   }
