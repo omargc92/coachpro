@@ -1,0 +1,1303 @@
+{
+  "url": "http://localhost:5173",
+  "widths": [
+    390,
+    360
+  ],
+  "height": 844,
+  "errors": [],
+  "shots": [
+    {
+      "idx": 1,
+      "name": "login",
+      "measures": {
+        "360": {
+          "clientWidth": 360,
+          "scrollWidth": 360,
+          "horizontalOverflow": false,
+          "widestOverflower": null,
+          "nav": {
+            "present": false
+          },
+          "header": {
+            "present": true,
+            "top": 167,
+            "height": 157,
+            "bg": "rgba(0, 0, 0, 0)",
+            "paddingTop": "0px",
+            "title": "CoachPro"
+          },
+          "action": {
+            "label": "Entrar",
+            "w": 294,
+            "h": 44,
+            "ok44": true,
+            "visibleInViewport": true,
+            "top": 533,
+            "bottom": 577
+          },
+          "contentUnderNav": null
+        },
+        "390": {
+          "clientWidth": 390,
+          "scrollWidth": 390,
+          "horizontalOverflow": false,
+          "widestOverflower": null,
+          "nav": {
+            "present": false
+          },
+          "header": {
+            "present": true,
+            "top": 173,
+            "height": 157,
+            "bg": "rgba(0, 0, 0, 0)",
+            "paddingTop": "0px",
+            "title": "CoachPro"
+          },
+          "action": {
+            "label": "Entrar",
+            "w": 324,
+            "h": 44,
+            "ok44": true,
+            "visibleInViewport": true,
+            "top": 539,
+            "bottom": 583
+          },
+          "contentUnderNav": null
+        }
+      }
+    },
+    {
+      "idx": 2,
+      "name": "coach-atletas",
+      "measures": {
+        "360": {
+          "clientWidth": 360,
+          "scrollWidth": 360,
+          "horizontalOverflow": false,
+          "widestOverflower": null,
+          "nav": {
+            "present": true,
+            "top": 784,
+            "height": 60,
+            "bg": "rgba(11, 11, 13, 0.92)",
+            "buttons": [
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Atletas",
+                "color": "rgb(216, 255, 62)"
+              },
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Rutinas",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Agenda",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Chat",
+                "color": "rgb(106, 108, 114)"
+              }
+            ],
+            "allButtons44": true
+          },
+          "header": {
+            "present": true,
+            "top": 16,
+            "height": 42,
+            "bg": "rgba(0, 0, 0, 0)",
+            "paddingTop": "0px",
+            "title": "Atletas"
+          },
+          "action": null,
+          "contentUnderNav": {
+            "navTop": 784,
+            "rootPaddingBottom": "96px",
+            "docScrollHeight": 844,
+            "viewportH": 844
+          }
+        },
+        "390": {
+          "clientWidth": 390,
+          "scrollWidth": 390,
+          "horizontalOverflow": false,
+          "widestOverflower": null,
+          "nav": {
+            "present": true,
+            "top": 784,
+            "height": 60,
+            "bg": "rgba(11, 11, 13, 0.92)",
+            "buttons": [
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Atletas",
+                "color": "rgb(216, 255, 62)"
+              },
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Rutinas",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Agenda",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Chat",
+                "color": "rgb(106, 108, 114)"
+              }
+            ],
+            "allButtons44": true
+          },
+          "header": {
+            "present": true,
+            "top": 16,
+            "height": 42,
+            "bg": "rgba(0, 0, 0, 0)",
+            "paddingTop": "0px",
+            "title": "Atletas"
+          },
+          "action": null,
+          "contentUnderNav": {
+            "navTop": 784,
+            "rootPaddingBottom": "96px",
+            "docScrollHeight": 844,
+            "viewportH": 844
+          }
+        }
+      }
+    },
+    {
+      "idx": 3,
+      "name": "coach-detalle-nutricion",
+      "measures": {
+        "360": {
+          "clientWidth": 360,
+          "scrollWidth": 360,
+          "horizontalOverflow": false,
+          "widestOverflower": null,
+          "nav": {
+            "present": false
+          },
+          "header": {
+            "present": true,
+            "top": 16,
+            "height": 42,
+            "bg": "rgba(0, 0, 0, 0)",
+            "paddingTop": "0px",
+            "title": "Alan"
+          },
+          "action": null,
+          "contentUnderNav": null
+        },
+        "390": {
+          "clientWidth": 390,
+          "scrollWidth": 390,
+          "horizontalOverflow": false,
+          "widestOverflower": null,
+          "nav": {
+            "present": false
+          },
+          "header": {
+            "present": true,
+            "top": 16,
+            "height": 42,
+            "bg": "rgba(0, 0, 0, 0)",
+            "paddingTop": "0px",
+            "title": "Alan"
+          },
+          "action": null,
+          "contentUnderNav": null
+        }
+      }
+    },
+    {
+      "idx": 4,
+      "name": "sheet-objetivos",
+      "measures": {
+        "360": {
+          "clientWidth": 360,
+          "scrollWidth": 360,
+          "horizontalOverflow": false,
+          "widestOverflower": null,
+          "nav": {
+            "present": false
+          },
+          "header": {
+            "present": true,
+            "top": 16,
+            "height": 42,
+            "bg": "rgba(0, 0, 0, 0)",
+            "paddingTop": "0px",
+            "title": "Alan"
+          },
+          "action": {
+            "label": "Guardar objetivos",
+            "w": 312,
+            "h": 44,
+            "ok44": true,
+            "visibleInViewport": true,
+            "top": 776,
+            "bottom": 820
+          },
+          "contentUnderNav": null
+        },
+        "390": {
+          "clientWidth": 390,
+          "scrollWidth": 390,
+          "horizontalOverflow": false,
+          "widestOverflower": null,
+          "nav": {
+            "present": false
+          },
+          "header": {
+            "present": true,
+            "top": 16,
+            "height": 42,
+            "bg": "rgba(0, 0, 0, 0)",
+            "paddingTop": "0px",
+            "title": "Alan"
+          },
+          "action": {
+            "label": "Guardar objetivos",
+            "w": 342,
+            "h": 44,
+            "ok44": true,
+            "visibleInViewport": true,
+            "top": 776,
+            "bottom": 820
+          },
+          "contentUnderNav": null
+        }
+      }
+    },
+    {
+      "idx": 5,
+      "name": "coach-rutinas",
+      "measures": {
+        "360": {
+          "clientWidth": 360,
+          "scrollWidth": 360,
+          "horizontalOverflow": false,
+          "widestOverflower": null,
+          "nav": {
+            "present": true,
+            "top": 784,
+            "height": 60,
+            "bg": "rgba(11, 11, 13, 0.92)",
+            "buttons": [
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Atletas",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Rutinas",
+                "color": "rgb(216, 255, 62)"
+              },
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Agenda",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Chat",
+                "color": "rgb(106, 108, 114)"
+              }
+            ],
+            "allButtons44": true
+          },
+          "header": {
+            "present": true,
+            "top": 16,
+            "height": 42,
+            "bg": "rgba(0, 0, 0, 0)",
+            "paddingTop": "0px",
+            "title": "Rutinas"
+          },
+          "action": null,
+          "contentUnderNav": {
+            "navTop": 784,
+            "rootPaddingBottom": "96px",
+            "docScrollHeight": 844,
+            "viewportH": 844
+          }
+        },
+        "390": {
+          "clientWidth": 390,
+          "scrollWidth": 390,
+          "horizontalOverflow": false,
+          "widestOverflower": null,
+          "nav": {
+            "present": true,
+            "top": 784,
+            "height": 60,
+            "bg": "rgba(11, 11, 13, 0.92)",
+            "buttons": [
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Atletas",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Rutinas",
+                "color": "rgb(216, 255, 62)"
+              },
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Agenda",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Chat",
+                "color": "rgb(106, 108, 114)"
+              }
+            ],
+            "allButtons44": true
+          },
+          "header": {
+            "present": true,
+            "top": 16,
+            "height": 42,
+            "bg": "rgba(0, 0, 0, 0)",
+            "paddingTop": "0px",
+            "title": "Rutinas"
+          },
+          "action": null,
+          "contentUnderNav": {
+            "navTop": 784,
+            "rootPaddingBottom": "96px",
+            "docScrollHeight": 844,
+            "viewportH": 844
+          }
+        }
+      }
+    },
+    {
+      "idx": 6,
+      "name": "coach-agenda",
+      "measures": {
+        "360": {
+          "clientWidth": 360,
+          "scrollWidth": 360,
+          "horizontalOverflow": false,
+          "widestOverflower": null,
+          "nav": {
+            "present": true,
+            "top": 784,
+            "height": 60,
+            "bg": "rgba(11, 11, 13, 0.92)",
+            "buttons": [
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Atletas",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Rutinas",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Agenda",
+                "color": "rgb(216, 255, 62)"
+              },
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Chat",
+                "color": "rgb(106, 108, 114)"
+              }
+            ],
+            "allButtons44": true
+          },
+          "header": {
+            "present": true,
+            "top": 16,
+            "height": 42,
+            "bg": "rgba(0, 0, 0, 0)",
+            "paddingTop": "0px",
+            "title": "Agenda"
+          },
+          "action": null,
+          "contentUnderNav": {
+            "navTop": 784,
+            "rootPaddingBottom": "96px",
+            "docScrollHeight": 844,
+            "viewportH": 844
+          }
+        },
+        "390": {
+          "clientWidth": 390,
+          "scrollWidth": 390,
+          "horizontalOverflow": false,
+          "widestOverflower": null,
+          "nav": {
+            "present": true,
+            "top": 784,
+            "height": 60,
+            "bg": "rgba(11, 11, 13, 0.92)",
+            "buttons": [
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Atletas",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Rutinas",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Agenda",
+                "color": "rgb(216, 255, 62)"
+              },
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Chat",
+                "color": "rgb(106, 108, 114)"
+              }
+            ],
+            "allButtons44": true
+          },
+          "header": {
+            "present": true,
+            "top": 16,
+            "height": 42,
+            "bg": "rgba(0, 0, 0, 0)",
+            "paddingTop": "0px",
+            "title": "Agenda"
+          },
+          "action": null,
+          "contentUnderNav": {
+            "navTop": 784,
+            "rootPaddingBottom": "96px",
+            "docScrollHeight": 844,
+            "viewportH": 844
+          }
+        }
+      }
+    },
+    {
+      "idx": 7,
+      "name": "coach-chat",
+      "measures": {
+        "360": {
+          "clientWidth": 360,
+          "scrollWidth": 360,
+          "horizontalOverflow": false,
+          "widestOverflower": null,
+          "nav": {
+            "present": true,
+            "top": 784,
+            "height": 60,
+            "bg": "rgba(11, 11, 13, 0.92)",
+            "buttons": [
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Atletas",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Rutinas",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Agenda",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Chat",
+                "color": "rgb(216, 255, 62)"
+              }
+            ],
+            "allButtons44": true
+          },
+          "header": {
+            "present": true,
+            "top": 16,
+            "height": 42,
+            "bg": "rgba(0, 0, 0, 0)",
+            "paddingTop": "0px",
+            "title": "Chat"
+          },
+          "action": null,
+          "contentUnderNav": {
+            "navTop": 784,
+            "rootPaddingBottom": "96px",
+            "docScrollHeight": 844,
+            "viewportH": 844
+          }
+        },
+        "390": {
+          "clientWidth": 390,
+          "scrollWidth": 390,
+          "horizontalOverflow": false,
+          "widestOverflower": null,
+          "nav": {
+            "present": true,
+            "top": 784,
+            "height": 60,
+            "bg": "rgba(11, 11, 13, 0.92)",
+            "buttons": [
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Atletas",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Rutinas",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Agenda",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Chat",
+                "color": "rgb(216, 255, 62)"
+              }
+            ],
+            "allButtons44": true
+          },
+          "header": {
+            "present": true,
+            "top": 16,
+            "height": 42,
+            "bg": "rgba(0, 0, 0, 0)",
+            "paddingTop": "0px",
+            "title": "Chat"
+          },
+          "action": null,
+          "contentUnderNav": {
+            "navTop": 784,
+            "rootPaddingBottom": "96px",
+            "docScrollHeight": 844,
+            "viewportH": 844
+          }
+        }
+      }
+    },
+    {
+      "idx": 8,
+      "name": "atleta-hoy",
+      "measures": {
+        "360": {
+          "clientWidth": 360,
+          "scrollWidth": 360,
+          "horizontalOverflow": false,
+          "widestOverflower": null,
+          "nav": {
+            "present": true,
+            "top": 784,
+            "height": 60,
+            "bg": "rgba(11, 11, 13, 0.92)",
+            "buttons": [
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Hoy",
+                "color": "rgb(216, 255, 62)"
+              },
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Nutrición",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Progreso",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Chat",
+                "color": "rgb(106, 108, 114)"
+              }
+            ],
+            "allButtons44": true
+          },
+          "header": {
+            "present": false
+          },
+          "action": null,
+          "contentUnderNav": {
+            "navTop": 784,
+            "rootPaddingBottom": "96px",
+            "docScrollHeight": 844,
+            "viewportH": 844
+          }
+        },
+        "390": {
+          "clientWidth": 390,
+          "scrollWidth": 390,
+          "horizontalOverflow": false,
+          "widestOverflower": null,
+          "nav": {
+            "present": true,
+            "top": 784,
+            "height": 60,
+            "bg": "rgba(11, 11, 13, 0.92)",
+            "buttons": [
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Hoy",
+                "color": "rgb(216, 255, 62)"
+              },
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Nutrición",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Progreso",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Chat",
+                "color": "rgb(106, 108, 114)"
+              }
+            ],
+            "allButtons44": true
+          },
+          "header": {
+            "present": false
+          },
+          "action": null,
+          "contentUnderNav": {
+            "navTop": 784,
+            "rootPaddingBottom": "96px",
+            "docScrollHeight": 844,
+            "viewportH": 844
+          }
+        }
+      }
+    },
+    {
+      "idx": 9,
+      "name": "atleta-nutricion",
+      "measures": {
+        "360": {
+          "clientWidth": 360,
+          "scrollWidth": 360,
+          "horizontalOverflow": false,
+          "widestOverflower": null,
+          "nav": {
+            "present": true,
+            "top": 784,
+            "height": 60,
+            "bg": "rgba(11, 11, 13, 0.92)",
+            "buttons": [
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Hoy",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Nutrición",
+                "color": "rgb(216, 255, 62)"
+              },
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Progreso",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Chat",
+                "color": "rgb(106, 108, 114)"
+              }
+            ],
+            "allButtons44": true
+          },
+          "header": {
+            "present": false
+          },
+          "action": {
+            "label": "Agregar",
+            "w": 160,
+            "h": 46,
+            "ok44": true,
+            "visibleInViewport": true,
+            "top": 753,
+            "bottom": 799
+          },
+          "contentUnderNav": {
+            "navTop": 784,
+            "rootPaddingBottom": "96px",
+            "docScrollHeight": 895,
+            "viewportH": 844
+          }
+        },
+        "390": {
+          "clientWidth": 390,
+          "scrollWidth": 390,
+          "horizontalOverflow": false,
+          "widestOverflower": null,
+          "nav": {
+            "present": true,
+            "top": 784,
+            "height": 60,
+            "bg": "rgba(11, 11, 13, 0.92)",
+            "buttons": [
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Hoy",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Nutrición",
+                "color": "rgb(216, 255, 62)"
+              },
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Progreso",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Chat",
+                "color": "rgb(106, 108, 114)"
+              }
+            ],
+            "allButtons44": true
+          },
+          "header": {
+            "present": false
+          },
+          "action": {
+            "label": "Agregar",
+            "w": 175,
+            "h": 46,
+            "ok44": true,
+            "visibleInViewport": true,
+            "top": 753,
+            "bottom": 799
+          },
+          "contentUnderNav": {
+            "navTop": 784,
+            "rootPaddingBottom": "96px",
+            "docScrollHeight": 895,
+            "viewportH": 844
+          }
+        }
+      }
+    },
+    {
+      "idx": 10,
+      "name": "sheet-agregar-comida",
+      "measures": {
+        "360": {
+          "clientWidth": 360,
+          "scrollWidth": 360,
+          "horizontalOverflow": false,
+          "widestOverflower": null,
+          "nav": {
+            "present": true,
+            "top": 784,
+            "height": 60,
+            "bg": "rgba(11, 11, 13, 0.92)",
+            "buttons": [
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Hoy",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Nutrición",
+                "color": "rgb(216, 255, 62)"
+              },
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Progreso",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Chat",
+                "color": "rgb(106, 108, 114)"
+              }
+            ],
+            "allButtons44": true
+          },
+          "header": {
+            "present": false
+          },
+          "action": {
+            "label": "Guardar comida",
+            "w": 312,
+            "h": 44,
+            "ok44": true,
+            "visibleInViewport": true,
+            "top": 776,
+            "bottom": 820
+          },
+          "contentUnderNav": {
+            "navTop": 784,
+            "rootPaddingBottom": "96px",
+            "docScrollHeight": 895,
+            "viewportH": 844
+          }
+        },
+        "390": {
+          "clientWidth": 390,
+          "scrollWidth": 390,
+          "horizontalOverflow": false,
+          "widestOverflower": null,
+          "nav": {
+            "present": true,
+            "top": 784,
+            "height": 60,
+            "bg": "rgba(11, 11, 13, 0.92)",
+            "buttons": [
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Hoy",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Nutrición",
+                "color": "rgb(216, 255, 62)"
+              },
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Progreso",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Chat",
+                "color": "rgb(106, 108, 114)"
+              }
+            ],
+            "allButtons44": true
+          },
+          "header": {
+            "present": false
+          },
+          "action": {
+            "label": "Guardar comida",
+            "w": 342,
+            "h": 44,
+            "ok44": true,
+            "visibleInViewport": true,
+            "top": 776,
+            "bottom": 820
+          },
+          "contentUnderNav": {
+            "navTop": 784,
+            "rootPaddingBottom": "96px",
+            "docScrollHeight": 895,
+            "viewportH": 844
+          }
+        }
+      }
+    },
+    {
+      "idx": 11,
+      "name": "sheet-buscar-alimento",
+      "measures": {
+        "360": {
+          "clientWidth": 360,
+          "scrollWidth": 360,
+          "horizontalOverflow": false,
+          "widestOverflower": null,
+          "nav": {
+            "present": true,
+            "top": 784,
+            "height": 60,
+            "bg": "rgba(11, 11, 13, 0.92)",
+            "buttons": [
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Hoy",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Nutrición",
+                "color": "rgb(216, 255, 62)"
+              },
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Progreso",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Chat",
+                "color": "rgb(106, 108, 114)"
+              }
+            ],
+            "allButtons44": true
+          },
+          "header": {
+            "present": false
+          },
+          "action": {
+            "label": "Agregar",
+            "w": 160,
+            "h": 46,
+            "ok44": true,
+            "visibleInViewport": true,
+            "top": 753,
+            "bottom": 799
+          },
+          "contentUnderNav": {
+            "navTop": 784,
+            "rootPaddingBottom": "96px",
+            "docScrollHeight": 895,
+            "viewportH": 844
+          }
+        },
+        "390": {
+          "clientWidth": 390,
+          "scrollWidth": 390,
+          "horizontalOverflow": false,
+          "widestOverflower": null,
+          "nav": {
+            "present": true,
+            "top": 784,
+            "height": 60,
+            "bg": "rgba(11, 11, 13, 0.92)",
+            "buttons": [
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Hoy",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Nutrición",
+                "color": "rgb(216, 255, 62)"
+              },
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Progreso",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Chat",
+                "color": "rgb(106, 108, 114)"
+              }
+            ],
+            "allButtons44": true
+          },
+          "header": {
+            "present": false
+          },
+          "action": {
+            "label": "Agregar",
+            "w": 175,
+            "h": 46,
+            "ok44": true,
+            "visibleInViewport": true,
+            "top": 753,
+            "bottom": 799
+          },
+          "contentUnderNav": {
+            "navTop": 784,
+            "rootPaddingBottom": "96px",
+            "docScrollHeight": 895,
+            "viewportH": 844
+          }
+        }
+      }
+    },
+    {
+      "idx": 12,
+      "name": "atleta-progreso",
+      "measures": {
+        "360": {
+          "clientWidth": 360,
+          "scrollWidth": 360,
+          "horizontalOverflow": false,
+          "widestOverflower": null,
+          "nav": {
+            "present": true,
+            "top": 784,
+            "height": 60,
+            "bg": "rgba(11, 11, 13, 0.92)",
+            "buttons": [
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Hoy",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Nutrición",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Progreso",
+                "color": "rgb(216, 255, 62)"
+              },
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Chat",
+                "color": "rgb(106, 108, 114)"
+              }
+            ],
+            "allButtons44": true
+          },
+          "header": {
+            "present": false
+          },
+          "action": null,
+          "contentUnderNav": {
+            "navTop": 784,
+            "rootPaddingBottom": "96px",
+            "docScrollHeight": 844,
+            "viewportH": 844
+          }
+        },
+        "390": {
+          "clientWidth": 390,
+          "scrollWidth": 390,
+          "horizontalOverflow": false,
+          "widestOverflower": null,
+          "nav": {
+            "present": true,
+            "top": 784,
+            "height": 60,
+            "bg": "rgba(11, 11, 13, 0.92)",
+            "buttons": [
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Hoy",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Nutrición",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Progreso",
+                "color": "rgb(216, 255, 62)"
+              },
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Chat",
+                "color": "rgb(106, 108, 114)"
+              }
+            ],
+            "allButtons44": true
+          },
+          "header": {
+            "present": false
+          },
+          "action": null,
+          "contentUnderNav": {
+            "navTop": 784,
+            "rootPaddingBottom": "96px",
+            "docScrollHeight": 844,
+            "viewportH": 844
+          }
+        }
+      }
+    },
+    {
+      "idx": 13,
+      "name": "atleta-chat",
+      "measures": {
+        "360": {
+          "clientWidth": 360,
+          "scrollWidth": 360,
+          "horizontalOverflow": false,
+          "widestOverflower": null,
+          "nav": {
+            "present": true,
+            "top": 784,
+            "height": 60,
+            "bg": "rgba(11, 11, 13, 0.92)",
+            "buttons": [
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Hoy",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Nutrición",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Progreso",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 90,
+                "h": 59,
+                "label": "Chat",
+                "color": "rgb(216, 255, 62)"
+              }
+            ],
+            "allButtons44": true
+          },
+          "header": {
+            "present": false
+          },
+          "action": null,
+          "contentUnderNav": {
+            "navTop": 784,
+            "rootPaddingBottom": "64px",
+            "docScrollHeight": 844,
+            "viewportH": 844
+          }
+        },
+        "390": {
+          "clientWidth": 390,
+          "scrollWidth": 390,
+          "horizontalOverflow": false,
+          "widestOverflower": null,
+          "nav": {
+            "present": true,
+            "top": 784,
+            "height": 60,
+            "bg": "rgba(11, 11, 13, 0.92)",
+            "buttons": [
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Hoy",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Nutrición",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Progreso",
+                "color": "rgb(106, 108, 114)"
+              },
+              {
+                "w": 98,
+                "h": 59,
+                "label": "Chat",
+                "color": "rgb(216, 255, 62)"
+              }
+            ],
+            "allButtons44": true
+          },
+          "header": {
+            "present": false
+          },
+          "action": null,
+          "contentUnderNav": {
+            "navTop": 784,
+            "rootPaddingBottom": "64px",
+            "docScrollHeight": 844,
+            "viewportH": 844
+          }
+        }
+      }
+    }
+  ]
+}

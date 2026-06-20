@@ -10,3 +10,4 @@ dev-dist
 supabase/.temp
 supabase/.branches
 qa/screenshots
+.env*
