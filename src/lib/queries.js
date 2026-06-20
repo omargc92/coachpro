@@ -260,6 +260,44 @@ export function useAtletaActividad(atletaId) {
   })
 }
 
+// Define/actualiza los objetivos de nutrición del atleta (vigentes desde hoy).
+// Versiona por fecha: reemplaza el objetivo de hoy si ya existe, si no inserta uno.
+export function useGuardarObjetivoNutricion(atletaId) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (metas) => {
+      const hoy = todayISO()
+      const fila = {
+        atleta_id: atletaId,
+        kcal: Math.round(Number(metas.kcal) || 0),
+        proteina_g: Math.round(Number(metas.proteina_g) || 0),
+        carbos_g: Math.round(Number(metas.carbos_g) || 0),
+        grasas_g: Math.round(Number(metas.grasas_g) || 0),
+        vigente_desde: hoy
+      }
+      const { data: existente, error: e0 } = await supabase
+        .from('objetivos_nutricion')
+        .select('id')
+        .eq('atleta_id', atletaId)
+        .eq('vigente_desde', hoy)
+        .maybeSingle()
+      if (e0) throw e0
+
+      if (existente) {
+        const { error } = await supabase.from('objetivos_nutricion').update(fila).eq('id', existente.id)
+        if (error) throw error
+      } else {
+        const { error } = await supabase.from('objetivos_nutricion').insert(fila)
+        if (error) throw error
+      }
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['atleta-actividad', atletaId] })
+      qc.invalidateQueries({ queryKey: ['atletas-resumen'] })
+    }
+  })
+}
+
 // ---------- CATÁLOGO DE EJERCICIOS ----------
 
 export function useEjercicios(coach) {

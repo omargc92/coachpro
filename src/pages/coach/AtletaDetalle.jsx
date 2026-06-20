@@ -5,10 +5,10 @@
 import { useState } from 'react'
 import { LineChart, Line, ResponsiveContainer, YAxis, XAxis, Tooltip } from 'recharts'
 import {
-  useAtleta, useMediciones, useAsignacionesAtleta, useAtletaActividad
+  useAtleta, useMediciones, useAsignacionesAtleta, useAtletaActividad, useGuardarObjetivoNutricion
 } from '../../lib/queries.js'
 import {
-  Screen, Header, Card, Row, Overline, Bar, Button, Badge, Icon, Loading, Empty
+  Screen, Header, Card, Row, Overline, Bar, Button, Badge, Icon, Loading, Empty, Sheet, Field
 } from '../../lib/ui.jsx'
 import { colors, space, font, radius, OBJETIVO_LABEL, DIAS } from '../../lib/theme.js'
 
@@ -17,7 +17,9 @@ export function AtletaDetalle({ atletaId, onBack }) {
   const { data: med } = useMediciones(atletaId)
   const { data: asign } = useAsignacionesAtleta(atletaId)
   const { data: act } = useAtletaActividad(atletaId)
+  const guardarObjetivo = useGuardarObjetivoNutricion(atletaId)
   const [copiado, setCopiado] = useState(false)
+  const [editObjetivo, setEditObjetivo] = useState(false)
 
   if (isLoading || !at) return <Screen><Loading /></Screen>
 
@@ -77,7 +79,12 @@ export function AtletaDetalle({ atletaId, onBack }) {
       </Card>
 
       {/* --- Nutrición hoy --- */}
-      <SeccionTitulo>Adherencia nutricional · hoy</SeccionTitulo>
+      <Row style={{ alignItems: 'center', marginBottom: space.sm }}>
+        <Overline style={{ flex: 1 }}>Adherencia nutricional · hoy</Overline>
+        <Button variant="ghost" icon="adjustments" onClick={() => setEditObjetivo(true)} style={{ padding: '4px 8px' }}>
+          {act?.objetivo ? 'Editar metas' : 'Definir metas'}
+        </Button>
+      </Row>
       <Nutricion act={act} />
 
       {/* --- Asistencias --- */}
@@ -97,7 +104,54 @@ export function AtletaDetalle({ atletaId, onBack }) {
       <Button variant="ghost" icon="message-circle" disabled>
         Abrir chat (Fase 4)
       </Button>
+
+      <ObjetivoSheet
+        open={editObjetivo}
+        onClose={() => setEditObjetivo(false)}
+        objetivo={act?.objetivo}
+        onGuardar={(metas) =>
+          guardarObjetivo.mutate(metas, { onSuccess: () => setEditObjetivo(false) })
+        }
+        guardando={guardarObjetivo.isPending}
+      />
     </Screen>
+  )
+}
+
+// Sheet para que el coach defina/edite los macros objetivo del atleta.
+function ObjetivoSheet({ open, onClose, objetivo, onGuardar, guardando }) {
+  const inicial = () => ({
+    kcal: objetivo?.kcal != null ? String(objetivo.kcal) : '',
+    proteina_g: objetivo?.proteina_g != null ? String(objetivo.proteina_g) : '',
+    carbos_g: objetivo?.carbos_g != null ? String(objetivo.carbos_g) : '',
+    grasas_g: objetivo?.grasas_g != null ? String(objetivo.grasas_g) : ''
+  })
+  const [f, setF] = useState(inicial)
+  // Reinicia el formulario cada vez que se abre con un objetivo distinto.
+  const [abiertoCon, setAbiertoCon] = useState(null)
+  if (open && abiertoCon !== objetivo) {
+    setAbiertoCon(objetivo)
+    setF(inicial())
+  }
+  const set = (k) => (v) => setF((p) => ({ ...p, [k]: v }))
+
+  return (
+    <Sheet open={open} onClose={onClose} title="Objetivos de nutrición">
+      <div style={{ ...font.small, color: colors.hint, marginBottom: space.md }}>
+        Metas diarias del atleta. Aplican desde hoy.
+      </div>
+      <Row>
+        <div style={{ flex: 1 }}><Field label="Kcal" type="number" value={f.kcal} onChange={set('kcal')} placeholder="0" /></div>
+        <div style={{ flex: 1 }}><Field label="Proteína (g)" type="number" value={f.proteina_g} onChange={set('proteina_g')} placeholder="0" /></div>
+      </Row>
+      <Row>
+        <div style={{ flex: 1 }}><Field label="Carbos (g)" type="number" value={f.carbos_g} onChange={set('carbos_g')} placeholder="0" /></div>
+        <div style={{ flex: 1 }}><Field label="Grasas (g)" type="number" value={f.grasas_g} onChange={set('grasas_g')} placeholder="0" /></div>
+      </Row>
+      <Button icon="check" onClick={() => onGuardar(f)} disabled={guardando || !(Number(f.kcal) > 0)}>
+        {guardando ? 'Guardando…' : 'Guardar objetivos'}
+      </Button>
+    </Sheet>
   )
 }
 

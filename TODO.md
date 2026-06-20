@@ -12,11 +12,12 @@ por ahora; los puntos de seguridad de abajo son para cuando se quiera blindar.
 - [ ] Considerar un **proyecto Supabase separado solo para la demo pública**, aislado de datos reales.
 
 ## ✨ Funcionalidad (stubs ya marcados en el código)
-- [ ] **Búsqueda de alimentos** en Nutrición: integrar Open Food Facts / USDA
-  (hoy `ComidaSheet.buscar()` es un stub que avisa "próximamente").
+- [x] **Búsqueda de alimentos** en Nutrición: integrada con Open Food Facts
+  (buscar → elegir cantidad en g → rellena descripción y macros escalados).
+- [x] Permitir al **coach editar los objetivos de nutrición** del atleta desde el detalle
+  (botón "Editar/Definir metas" → sheet con kcal/proteína/carbos/grasas, versionado por fecha).
 - [ ] (Opcional) Estimación automática de macros desde la **foto del plato**
   (hoy la foto se guarda y el coach valida a mano).
-- [ ] Permitir al **coach editar los objetivos de nutrición** del atleta desde el detalle.
 
 ## 🗄️ Storage
 - [ ] Si el bucket `fotos` se vuelve **privado**, servir imágenes con **URLs firmadas**

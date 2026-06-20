@@ -4,6 +4,7 @@
 // ============================================================
 import { useRef, useState } from 'react'
 import { usePortalNutricion, useRegistrarComida, subirFoto, todayISO } from '../../lib/queries.js'
+import { buscarAlimentos, escalarMacros } from '../../lib/foods.js'
 import {
   Card, Ring, Bar, Overline, Button, Sheet, Field, Select, Icon, Badge, Loading, Empty, Row
 } from '../../lib/ui.jsx'
@@ -150,7 +151,14 @@ function MacroLinea({ label, v, m, unit, color }) {
 function ComidaSheet({ open, onClose, foto, onGuardar, guardando }) {
   const vacio = { momento: 'comida', descripcion: '', kcal: '', proteina_g: '', carbos_g: '', grasas_g: '' }
   const [f, setF] = useState(vacio)
+  const [buscando, setBuscando] = useState(false)
   const set = (k) => (v) => setF((p) => ({ ...p, [k]: v }))
+
+  function cerrar() {
+    setF(vacio)
+    setBuscando(false)
+    onClose()
+  }
 
   function guardar() {
     onGuardar({
@@ -162,25 +170,39 @@ function ComidaSheet({ open, onClose, foto, onGuardar, guardando }) {
       grasas_g: Number(f.grasas_g) || 0,
       foto_url: foto || null
     })
-    setF(vacio)
-    onClose()
+    cerrar()
   }
 
-  // Búsqueda manual (stub): integrar luego Open Food Facts / USDA.
-  function buscar() {
-    alert('Búsqueda de alimentos: próximamente (Open Food Facts / USDA).')
+  // Aplica un alimento elegido en el buscador: rellena descripción y macros.
+  function aplicarAlimento({ nombre, gramos, macros }) {
+    setF((p) => ({
+      ...p,
+      descripcion: gramos === 100 ? nombre : `${nombre} (${gramos} g)`,
+      kcal: String(macros.kcal),
+      proteina_g: String(macros.proteina_g),
+      carbos_g: String(macros.carbos_g),
+      grasas_g: String(macros.grasas_g)
+    }))
+    setBuscando(false)
   }
+
+  if (buscando)
+    return (
+      <Sheet open={open} onClose={cerrar} title="Buscar alimento">
+        <BuscadorAlimentos onElegir={aplicarAlimento} onCancelar={() => setBuscando(false)} />
+      </Sheet>
+    )
 
   return (
-    <Sheet open={open} onClose={onClose} title="Agregar comida">
+    <Sheet open={open} onClose={cerrar} title="Agregar comida">
       {foto && (
         <img src={foto} alt="" style={{ width: '100%', height: 160, objectFit: 'cover', borderRadius: radius.md, marginBottom: space.md }} />
       )}
       <Select label="Momento" value={f.momento} onChange={set('momento')} options={MOMENTOS} />
       <Field label="Descripción" value={f.descripcion} onChange={set('descripcion')} placeholder="Ej. Pollo con arroz" />
 
-      <Button variant="ghost" icon="search" onClick={buscar} style={{ marginBottom: space.md }}>
-        Buscar alimento (próximamente)
+      <Button variant="ghost" icon="search" onClick={() => setBuscando(true)} style={{ marginBottom: space.md }}>
+        Buscar alimento
       </Button>
 
       <Row>
@@ -192,11 +214,104 @@ function ComidaSheet({ open, onClose, foto, onGuardar, guardando }) {
         <div style={{ flex: 1 }}><Field label="Grasas (g)" type="number" value={f.grasas_g} onChange={set('grasas_g')} placeholder="0" /></div>
       </Row>
       <div style={{ ...font.small, color: colors.hint, marginBottom: space.md }}>
-        Los macros los valida tu coach. La foto se guarda sin estimación automática por ahora.
+        Datos de Open Food Facts; tu coach valida los macros. La foto se guarda sin estimación automática.
       </div>
       <Button icon="check" onClick={guardar} disabled={guardando}>
         {guardando ? 'Guardando…' : 'Guardar comida'}
       </Button>
     </Sheet>
+  )
+}
+
+// Buscador de alimentos: query → lista → elegir cantidad → devolver macros.
+function BuscadorAlimentos({ onElegir, onCancelar }) {
+  const [q, setQ] = useState('')
+  const [estado, setEstado] = useState('idle') // idle | cargando | ok | error
+  const [resultados, setResultados] = useState([])
+  const [sel, setSel] = useState(null) // alimento elegido (para fijar cantidad)
+  const [gramos, setGramos] = useState('100')
+
+  async function ejecutar() {
+    if (!q.trim()) return
+    setEstado('cargando')
+    setSel(null)
+    try {
+      const r = await buscarAlimentos(q)
+      setResultados(r)
+      setEstado('ok')
+    } catch {
+      setEstado('error')
+    }
+  }
+
+  function onKeyDown(e) {
+    if (e.key === 'Enter') {
+      e.preventDefault()
+      ejecutar()
+    }
+  }
+
+  // Paso 2: cantidad para el alimento seleccionado.
+  if (sel) {
+    const macros = escalarMacros(sel.per100, gramos)
+    return (
+      <>
+        <div style={{ ...font.body, color: colors.title, marginBottom: 2 }}>{sel.nombre}</div>
+        {sel.marca && <div style={{ ...font.small, color: colors.muted, marginBottom: space.md }}>{sel.marca}</div>}
+        <Field label="Cantidad (g)" type="number" value={gramos} onChange={setGramos} placeholder="100" />
+        <Card style={{ marginBottom: space.md, display: 'flex', justifyContent: 'space-between', ...font.small, color: colors.body }}>
+          <span><b style={{ color: colors.info }}>{macros.kcal}</b> kcal</span>
+          <span><b style={{ color: colors.accent }}>{macros.proteina_g}</b> P</span>
+          <span><b style={{ color: colors.title }}>{macros.carbos_g}</b> C</span>
+          <span><b style={{ color: colors.title }}>{macros.grasas_g}</b> G</span>
+        </Card>
+        <Row>
+          <Button variant="surface" icon="arrow-left" onClick={() => setSel(null)} style={{ flex: 1 }}>Volver</Button>
+          <Button
+            icon="check"
+            onClick={() => onElegir({ nombre: sel.nombre, gramos: Number(gramos) || 0, macros })}
+            disabled={!(Number(gramos) > 0)}
+            style={{ flex: 1 }}
+          >
+            Usar
+          </Button>
+        </Row>
+      </>
+    )
+  }
+
+  // Paso 1: búsqueda + lista.
+  return (
+    <>
+      <Row style={{ marginBottom: space.md }}>
+        <div style={{ flex: 1 }}>
+          <Field label="" value={q} onChange={setQ} onKeyDown={onKeyDown} placeholder="Ej. yogur griego" />
+        </div>
+        <Button icon="search" onClick={ejecutar} disabled={estado === 'cargando' || !q.trim()}>Buscar</Button>
+      </Row>
+
+      {estado === 'cargando' && <Loading label="Buscando…" />}
+      {estado === 'error' && (
+        <Empty icon="wifi-off" title="No se pudo buscar" hint="Revisa tu conexión e inténtalo de nuevo." />
+      )}
+      {estado === 'ok' && resultados.length === 0 && (
+        <Empty icon="search-off" title="Sin resultados" hint="Prueba con otro nombre o más general." />
+      )}
+
+      {resultados.length > 0 && (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: space.xs, marginBottom: space.md }}>
+          {resultados.map((a, i) => (
+            <Card key={i} onClick={() => { setGramos('100'); setSel(a) }} style={{ padding: '10px 12px' }}>
+              <div style={{ ...font.body, color: colors.title }}>{a.nombre}</div>
+              <div style={{ ...font.small, color: colors.muted }}>
+                {a.marca ? `${a.marca} · ` : ''}{a.per100.kcal} kcal · {a.per100.prot}g P / 100 g
+              </div>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      <Button variant="ghost" icon="arrow-left" onClick={onCancelar}>Volver a entrada manual</Button>
+    </>
   )
 }
