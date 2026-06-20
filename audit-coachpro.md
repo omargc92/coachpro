@@ -8,7 +8,14 @@
 
 **Todas las capturas en una sola imagen:** [`audit/_all-screenshots.png`](audit/_all-screenshots.png) (contact sheet de las 13 pantallas × 2 anchos).
 
-![contact sheet](audit/_all-screenshots.png)
+> ℹ️ **Actualización post-refinamiento (Fases 1 y 2 aplicadas).** Las capturas individuales y el contact sheet de abajo reflejan el estado **después** del refinamiento. El estado **antes** quedó preservado en [`audit/_all-screenshots-before.png`](audit/_all-screenshots-before.png).
+>
+> **Re-auditoría tras los cambios:** cero scroll horizontal en las 26 capturas (390/360px), touch targets nav 90×67px y botones de acción ≥44px, **0 errores JS**.
+>
+> Fixes Fase 1 (A1–A5): título+acción del detalle apilados · fila de búsqueda apilada · etiqueta de eje ya no se recorta · chat anclado al fondo · empty-state/tip en Rutinas.
+> Refinamientos Fase 2 (B1–B5): jerarquía de Header · cards de atleta · anillos hero con glow · handle de sheet · pill activo en BottomNav · press state en cards.
+
+![contact sheet (después)](audit/_all-screenshots.png)
 
 ---
 

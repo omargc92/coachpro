@@ -78,31 +78,31 @@
           "widestOverflower": null,
           "nav": {
             "present": true,
-            "top": 784,
-            "height": 60,
+            "top": 776,
+            "height": 68,
             "bg": "rgba(11, 11, 13, 0.92)",
             "buttons": [
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Atletas",
                 "color": "rgb(216, 255, 62)"
               },
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Rutinas",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Agenda",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Chat",
                 "color": "rgb(106, 108, 114)"
               }
@@ -112,14 +112,14 @@
           "header": {
             "present": true,
             "top": 16,
-            "height": 42,
+            "height": 44,
             "bg": "rgba(0, 0, 0, 0)",
             "paddingTop": "0px",
             "title": "Atletas"
           },
           "action": null,
           "contentUnderNav": {
-            "navTop": 784,
+            "navTop": 776,
             "rootPaddingBottom": "96px",
             "docScrollHeight": 844,
             "viewportH": 844
@@ -132,31 +132,31 @@
           "widestOverflower": null,
           "nav": {
             "present": true,
-            "top": 784,
-            "height": 60,
+            "top": 776,
+            "height": 68,
             "bg": "rgba(11, 11, 13, 0.92)",
             "buttons": [
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Atletas",
                 "color": "rgb(216, 255, 62)"
               },
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Rutinas",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Agenda",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Chat",
                 "color": "rgb(106, 108, 114)"
               }
@@ -166,14 +166,14 @@
           "header": {
             "present": true,
             "top": 16,
-            "height": 42,
+            "height": 44,
             "bg": "rgba(0, 0, 0, 0)",
             "paddingTop": "0px",
             "title": "Atletas"
           },
           "action": null,
           "contentUnderNav": {
-            "navTop": 784,
+            "navTop": 776,
             "rootPaddingBottom": "96px",
             "docScrollHeight": 844,
             "viewportH": 844
@@ -196,7 +196,7 @@
           "header": {
             "present": true,
             "top": 16,
-            "height": 42,
+            "height": 44,
             "bg": "rgba(0, 0, 0, 0)",
             "paddingTop": "0px",
             "title": "Alan"
@@ -215,7 +215,7 @@
           "header": {
             "present": true,
             "top": 16,
-            "height": 42,
+            "height": 44,
             "bg": "rgba(0, 0, 0, 0)",
             "paddingTop": "0px",
             "title": "Alan"
@@ -240,7 +240,7 @@
           "header": {
             "present": true,
             "top": 16,
-            "height": 42,
+            "height": 44,
             "bg": "rgba(0, 0, 0, 0)",
             "paddingTop": "0px",
             "title": "Alan"
@@ -267,7 +267,7 @@
           "header": {
             "present": true,
             "top": 16,
-            "height": 42,
+            "height": 44,
             "bg": "rgba(0, 0, 0, 0)",
             "paddingTop": "0px",
             "title": "Alan"
@@ -296,31 +296,31 @@
           "widestOverflower": null,
           "nav": {
             "present": true,
-            "top": 784,
-            "height": 60,
+            "top": 776,
+            "height": 68,
             "bg": "rgba(11, 11, 13, 0.92)",
             "buttons": [
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Atletas",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Rutinas",
                 "color": "rgb(216, 255, 62)"
               },
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Agenda",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Chat",
                 "color": "rgb(106, 108, 114)"
               }
@@ -330,14 +330,14 @@
           "header": {
             "present": true,
             "top": 16,
-            "height": 42,
+            "height": 44,
             "bg": "rgba(0, 0, 0, 0)",
             "paddingTop": "0px",
             "title": "Rutinas"
           },
           "action": null,
           "contentUnderNav": {
-            "navTop": 784,
+            "navTop": 776,
             "rootPaddingBottom": "96px",
             "docScrollHeight": 844,
             "viewportH": 844
@@ -350,31 +350,31 @@
           "widestOverflower": null,
           "nav": {
             "present": true,
-            "top": 784,
-            "height": 60,
+            "top": 776,
+            "height": 68,
             "bg": "rgba(11, 11, 13, 0.92)",
             "buttons": [
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Atletas",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Rutinas",
                 "color": "rgb(216, 255, 62)"
               },
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Agenda",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Chat",
                 "color": "rgb(106, 108, 114)"
               }
@@ -384,14 +384,14 @@
           "header": {
             "present": true,
             "top": 16,
-            "height": 42,
+            "height": 44,
             "bg": "rgba(0, 0, 0, 0)",
             "paddingTop": "0px",
             "title": "Rutinas"
           },
           "action": null,
           "contentUnderNav": {
-            "navTop": 784,
+            "navTop": 776,
             "rootPaddingBottom": "96px",
             "docScrollHeight": 844,
             "viewportH": 844
@@ -410,31 +410,31 @@
           "widestOverflower": null,
           "nav": {
             "present": true,
-            "top": 784,
-            "height": 60,
+            "top": 776,
+            "height": 68,
             "bg": "rgba(11, 11, 13, 0.92)",
             "buttons": [
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Atletas",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Rutinas",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Agenda",
                 "color": "rgb(216, 255, 62)"
               },
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Chat",
                 "color": "rgb(106, 108, 114)"
               }
@@ -444,14 +444,14 @@
           "header": {
             "present": true,
             "top": 16,
-            "height": 42,
+            "height": 44,
             "bg": "rgba(0, 0, 0, 0)",
             "paddingTop": "0px",
             "title": "Agenda"
           },
           "action": null,
           "contentUnderNav": {
-            "navTop": 784,
+            "navTop": 776,
             "rootPaddingBottom": "96px",
             "docScrollHeight": 844,
             "viewportH": 844
@@ -464,31 +464,31 @@
           "widestOverflower": null,
           "nav": {
             "present": true,
-            "top": 784,
-            "height": 60,
+            "top": 776,
+            "height": 68,
             "bg": "rgba(11, 11, 13, 0.92)",
             "buttons": [
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Atletas",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Rutinas",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Agenda",
                 "color": "rgb(216, 255, 62)"
               },
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Chat",
                 "color": "rgb(106, 108, 114)"
               }
@@ -498,14 +498,14 @@
           "header": {
             "present": true,
             "top": 16,
-            "height": 42,
+            "height": 44,
             "bg": "rgba(0, 0, 0, 0)",
             "paddingTop": "0px",
             "title": "Agenda"
           },
           "action": null,
           "contentUnderNav": {
-            "navTop": 784,
+            "navTop": 776,
             "rootPaddingBottom": "96px",
             "docScrollHeight": 844,
             "viewportH": 844
@@ -524,31 +524,31 @@
           "widestOverflower": null,
           "nav": {
             "present": true,
-            "top": 784,
-            "height": 60,
+            "top": 776,
+            "height": 68,
             "bg": "rgba(11, 11, 13, 0.92)",
             "buttons": [
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Atletas",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Rutinas",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Agenda",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Chat",
                 "color": "rgb(216, 255, 62)"
               }
@@ -558,14 +558,14 @@
           "header": {
             "present": true,
             "top": 16,
-            "height": 42,
+            "height": 44,
             "bg": "rgba(0, 0, 0, 0)",
             "paddingTop": "0px",
             "title": "Chat"
           },
           "action": null,
           "contentUnderNav": {
-            "navTop": 784,
+            "navTop": 776,
             "rootPaddingBottom": "96px",
             "docScrollHeight": 844,
             "viewportH": 844
@@ -578,31 +578,31 @@
           "widestOverflower": null,
           "nav": {
             "present": true,
-            "top": 784,
-            "height": 60,
+            "top": 776,
+            "height": 68,
             "bg": "rgba(11, 11, 13, 0.92)",
             "buttons": [
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Atletas",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Rutinas",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Agenda",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Chat",
                 "color": "rgb(216, 255, 62)"
               }
@@ -612,14 +612,14 @@
           "header": {
             "present": true,
             "top": 16,
-            "height": 42,
+            "height": 44,
             "bg": "rgba(0, 0, 0, 0)",
             "paddingTop": "0px",
             "title": "Chat"
           },
           "action": null,
           "contentUnderNav": {
-            "navTop": 784,
+            "navTop": 776,
             "rootPaddingBottom": "96px",
             "docScrollHeight": 844,
             "viewportH": 844
@@ -638,31 +638,31 @@
           "widestOverflower": null,
           "nav": {
             "present": true,
-            "top": 784,
-            "height": 60,
+            "top": 776,
+            "height": 68,
             "bg": "rgba(11, 11, 13, 0.92)",
             "buttons": [
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Hoy",
                 "color": "rgb(216, 255, 62)"
               },
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Nutrición",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Progreso",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Chat",
                 "color": "rgb(106, 108, 114)"
               }
@@ -674,7 +674,7 @@
           },
           "action": null,
           "contentUnderNav": {
-            "navTop": 784,
+            "navTop": 776,
             "rootPaddingBottom": "96px",
             "docScrollHeight": 844,
             "viewportH": 844
@@ -687,31 +687,31 @@
           "widestOverflower": null,
           "nav": {
             "present": true,
-            "top": 784,
-            "height": 60,
+            "top": 776,
+            "height": 68,
             "bg": "rgba(11, 11, 13, 0.92)",
             "buttons": [
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Hoy",
                 "color": "rgb(216, 255, 62)"
               },
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Nutrición",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Progreso",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Chat",
                 "color": "rgb(106, 108, 114)"
               }
@@ -723,7 +723,7 @@
           },
           "action": null,
           "contentUnderNav": {
-            "navTop": 784,
+            "navTop": 776,
             "rootPaddingBottom": "96px",
             "docScrollHeight": 844,
             "viewportH": 844
@@ -742,31 +742,31 @@
           "widestOverflower": null,
           "nav": {
             "present": true,
-            "top": 784,
-            "height": 60,
+            "top": 776,
+            "height": 68,
             "bg": "rgba(11, 11, 13, 0.92)",
             "buttons": [
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Hoy",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Nutrición",
                 "color": "rgb(216, 255, 62)"
               },
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Progreso",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Chat",
                 "color": "rgb(106, 108, 114)"
               }
@@ -786,7 +786,7 @@
             "bottom": 799
           },
           "contentUnderNav": {
-            "navTop": 784,
+            "navTop": 776,
             "rootPaddingBottom": "96px",
             "docScrollHeight": 895,
             "viewportH": 844
@@ -799,31 +799,31 @@
           "widestOverflower": null,
           "nav": {
             "present": true,
-            "top": 784,
-            "height": 60,
+            "top": 776,
+            "height": 68,
             "bg": "rgba(11, 11, 13, 0.92)",
             "buttons": [
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Hoy",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Nutrición",
                 "color": "rgb(216, 255, 62)"
               },
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Progreso",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Chat",
                 "color": "rgb(106, 108, 114)"
               }
@@ -843,7 +843,7 @@
             "bottom": 799
           },
           "contentUnderNav": {
-            "navTop": 784,
+            "navTop": 776,
             "rootPaddingBottom": "96px",
             "docScrollHeight": 895,
             "viewportH": 844
@@ -862,31 +862,31 @@
           "widestOverflower": null,
           "nav": {
             "present": true,
-            "top": 784,
-            "height": 60,
+            "top": 776,
+            "height": 68,
             "bg": "rgba(11, 11, 13, 0.92)",
             "buttons": [
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Hoy",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Nutrición",
                 "color": "rgb(216, 255, 62)"
               },
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Progreso",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Chat",
                 "color": "rgb(106, 108, 114)"
               }
@@ -906,7 +906,7 @@
             "bottom": 820
           },
           "contentUnderNav": {
-            "navTop": 784,
+            "navTop": 776,
             "rootPaddingBottom": "96px",
             "docScrollHeight": 895,
             "viewportH": 844
@@ -919,31 +919,31 @@
           "widestOverflower": null,
           "nav": {
             "present": true,
-            "top": 784,
-            "height": 60,
+            "top": 776,
+            "height": 68,
             "bg": "rgba(11, 11, 13, 0.92)",
             "buttons": [
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Hoy",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Nutrición",
                 "color": "rgb(216, 255, 62)"
               },
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Progreso",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Chat",
                 "color": "rgb(106, 108, 114)"
               }
@@ -963,7 +963,7 @@
             "bottom": 820
           },
           "contentUnderNav": {
-            "navTop": 784,
+            "navTop": 776,
             "rootPaddingBottom": "96px",
             "docScrollHeight": 895,
             "viewportH": 844
@@ -982,31 +982,31 @@
           "widestOverflower": null,
           "nav": {
             "present": true,
-            "top": 784,
-            "height": 60,
+            "top": 776,
+            "height": 68,
             "bg": "rgba(11, 11, 13, 0.92)",
             "buttons": [
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Hoy",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Nutrición",
                 "color": "rgb(216, 255, 62)"
               },
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Progreso",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Chat",
                 "color": "rgb(106, 108, 114)"
               }
@@ -1022,11 +1022,11 @@
             "h": 46,
             "ok44": true,
             "visibleInViewport": true,
-            "top": 753,
-            "bottom": 799
+            "top": 702,
+            "bottom": 748
           },
           "contentUnderNav": {
-            "navTop": 784,
+            "navTop": 776,
             "rootPaddingBottom": "96px",
             "docScrollHeight": 895,
             "viewportH": 844
@@ -1039,31 +1039,31 @@
           "widestOverflower": null,
           "nav": {
             "present": true,
-            "top": 784,
-            "height": 60,
+            "top": 776,
+            "height": 68,
             "bg": "rgba(11, 11, 13, 0.92)",
             "buttons": [
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Hoy",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Nutrición",
                 "color": "rgb(216, 255, 62)"
               },
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Progreso",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Chat",
                 "color": "rgb(106, 108, 114)"
               }
@@ -1079,11 +1079,11 @@
             "h": 46,
             "ok44": true,
             "visibleInViewport": true,
-            "top": 753,
-            "bottom": 799
+            "top": 702,
+            "bottom": 748
           },
           "contentUnderNav": {
-            "navTop": 784,
+            "navTop": 776,
             "rootPaddingBottom": "96px",
             "docScrollHeight": 895,
             "viewportH": 844
@@ -1102,31 +1102,31 @@
           "widestOverflower": null,
           "nav": {
             "present": true,
-            "top": 784,
-            "height": 60,
+            "top": 776,
+            "height": 68,
             "bg": "rgba(11, 11, 13, 0.92)",
             "buttons": [
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Hoy",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Nutrición",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Progreso",
                 "color": "rgb(216, 255, 62)"
               },
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Chat",
                 "color": "rgb(106, 108, 114)"
               }
@@ -1138,7 +1138,7 @@
           },
           "action": null,
           "contentUnderNav": {
-            "navTop": 784,
+            "navTop": 776,
             "rootPaddingBottom": "96px",
             "docScrollHeight": 844,
             "viewportH": 844
@@ -1151,31 +1151,31 @@
           "widestOverflower": null,
           "nav": {
             "present": true,
-            "top": 784,
-            "height": 60,
+            "top": 776,
+            "height": 68,
             "bg": "rgba(11, 11, 13, 0.92)",
             "buttons": [
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Hoy",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Nutrición",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Progreso",
                 "color": "rgb(216, 255, 62)"
               },
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Chat",
                 "color": "rgb(106, 108, 114)"
               }
@@ -1187,7 +1187,7 @@
           },
           "action": null,
           "contentUnderNav": {
-            "navTop": 784,
+            "navTop": 776,
             "rootPaddingBottom": "96px",
             "docScrollHeight": 844,
             "viewportH": 844
@@ -1206,31 +1206,31 @@
           "widestOverflower": null,
           "nav": {
             "present": true,
-            "top": 784,
-            "height": 60,
+            "top": 776,
+            "height": 68,
             "bg": "rgba(11, 11, 13, 0.92)",
             "buttons": [
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Hoy",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Nutrición",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Progreso",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 90,
-                "h": 59,
+                "h": 67,
                 "label": "Chat",
                 "color": "rgb(216, 255, 62)"
               }
@@ -1242,7 +1242,7 @@
           },
           "action": null,
           "contentUnderNav": {
-            "navTop": 784,
+            "navTop": 776,
             "rootPaddingBottom": "64px",
             "docScrollHeight": 844,
             "viewportH": 844
@@ -1255,31 +1255,31 @@
           "widestOverflower": null,
           "nav": {
             "present": true,
-            "top": 784,
-            "height": 60,
+            "top": 776,
+            "height": 68,
             "bg": "rgba(11, 11, 13, 0.92)",
             "buttons": [
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Hoy",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Nutrición",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Progreso",
                 "color": "rgb(106, 108, 114)"
               },
               {
                 "w": 98,
-                "h": 59,
+                "h": 67,
                 "label": "Chat",
                 "color": "rgb(216, 255, 62)"
               }
@@ -1291,7 +1291,7 @@
           },
           "action": null,
           "contentUnderNav": {
-            "navTop": 784,
+            "navTop": 776,
             "rootPaddingBottom": "64px",
             "docScrollHeight": 844,
             "viewportH": 844
