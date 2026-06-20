@@ -7,6 +7,10 @@ Lista viva. El repo es **público**; las credenciales demo ya fueron **rotadas y
 - [ ] **Configurar `ANTHROPIC_API_KEY` en Vercel** para activar la estimación de macros por
   foto (el código y la función `/api/estimar-macros` ya están desplegados; sin la key
   devuelve un error controlado). `vercel env add ANTHROPIC_API_KEY production` + redeploy.
+  La key se genera en console.anthropic.com → API Keys (cuenta individual, con saldo).
+- [ ] **(Seguridad) Rotar el `service_role` key de Supabase** — quedó expuesto en un chat al
+  re-rotar las credenciales demo. Supabase Dashboard → Settings → API → JWT Settings → Rotate.
+  Ojo: invalida también la `anon` key → actualizar `VITE_SUPABASE_ANON_KEY` en Vercel + redeploy.
 - [ ] **Verificar el fix del SW en un dispositivo real** con caché previa (abrir la prod
   debería ofrecer "Actualizar" o cargar limpio, no colgarse). Validación manual en campo.
 - [ ] (Opcional) **Proyecto Supabase separado solo para la demo pública**, aislado de datos reales.
