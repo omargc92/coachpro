@@ -16,6 +16,7 @@ export function Icon({ name, size = 20, color = 'currentColor', style }) {
 
 // ---------- Pantalla / contenedor mobile ----------
 export function Screen({ children, pad = true, style }) {
+  const base = pad ? space.md : 0
   return (
     <div
       style={{
@@ -25,7 +26,12 @@ export function Screen({ children, pad = true, style }) {
         fontFamily: font.family,
         maxWidth: 520,
         margin: '0 auto',
-        padding: pad ? `${space.md}px ${space.md}px 96px` : 0,
+        // Safe-area lateral (notch en landscape) — devuelve 0 si no hay recortes.
+        paddingTop: base,
+        paddingRight: `calc(${base}px + env(safe-area-inset-right))`,
+        paddingLeft: `calc(${base}px + env(safe-area-inset-left))`,
+        // Deja sitio bajo el BottomNav fijo + la barra de gestos.
+        paddingBottom: pad ? `calc(96px + env(safe-area-inset-bottom))` : 0,
         boxSizing: 'border-box',
         ...style
       }}
@@ -282,7 +288,17 @@ export function Bar({ value, color = colors.accent, height = 8 }) {
 // ---------- Encabezado de pantalla ----------
 export function Header({ title, subtitle, right, onBack }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: space.sm, marginBottom: space.lg }}>
+    <div
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: space.sm,
+        marginBottom: space.lg,
+        // Empuja el contenido bajo el notch/Dynamic Island; charcoal detrás de la status bar.
+        paddingTop: 'env(safe-area-inset-top)',
+        backgroundColor: colors.bg
+      }}
+    >
       {onBack && (
         <button
           onClick={onBack}
@@ -318,11 +334,16 @@ export function BottomNav({ items, active, onChange }) {
         right: 0,
         maxWidth: 520,
         margin: '0 auto',
+        // Charcoal translúcido (#0B0B0D al 92%) + blur; el #root charcoal evita franjas blancas.
         background: 'rgba(11,11,13,0.92)',
         backdropFilter: 'blur(12px)',
+        WebkitBackdropFilter: 'blur(12px)',
         borderTop: `0.5px solid ${colors.border}`,
         display: 'flex',
-        paddingBottom: 'env(safe-area-inset-bottom)'
+        // Safe-area: barra de gestos abajo + notch lateral en landscape.
+        paddingBottom: 'env(safe-area-inset-bottom)',
+        paddingLeft: 'env(safe-area-inset-left)',
+        paddingRight: 'env(safe-area-inset-right)'
       }}
     >
       {items.map((it) => {
@@ -333,6 +354,7 @@ export function BottomNav({ items, active, onChange }) {
             onClick={() => onChange(it.key)}
             style={{
               flex: 1,
+              minHeight: 44, // área táctil mínima accesible
               background: 'transparent',
               border: 'none',
               cursor: 'pointer',
@@ -340,6 +362,7 @@ export function BottomNav({ items, active, onChange }) {
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
+              justifyContent: 'center',
               gap: 3,
               color: on ? colors.accent : colors.hint
             }}
@@ -386,9 +409,11 @@ export function Sheet({ open, onClose, title, children }) {
           borderTopRightRadius: radius.lg,
           borderTop: `0.5px solid ${colors.border}`,
           padding: space.lg,
+          // Respeta safe-area abajo (gestos/teclado); arriba nunca invade el notch.
           paddingBottom: `calc(${space.lg}px + env(safe-area-inset-bottom))`,
-          maxHeight: '88dvh',
+          maxHeight: `calc(100dvh - env(safe-area-inset-top) - ${space.lg}px)`,
           overflowY: 'auto',
+          WebkitOverflowScrolling: 'touch',
           boxSizing: 'border-box'
         }}
       >

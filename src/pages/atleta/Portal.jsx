@@ -25,7 +25,7 @@ export function AtletaPortal({ token }) {
   if (tab === 'chat') {
     return (
       <>
-        <Screen pad={false} style={{ display: 'flex', flexDirection: 'column', height: '100dvh', paddingBottom: 64 }}>
+        <Screen pad={false} style={{ display: 'flex', flexDirection: 'column', height: '100dvh', paddingBottom: 'calc(64px + env(safe-area-inset-bottom))' }}>
           <ChatAtleta token={token} />
         </Screen>
         <BottomNav items={NAV} active={tab} onChange={setTab} />

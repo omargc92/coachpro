@@ -2,20 +2,26 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <title>CoachPro</title>
     <meta name="description" content="Seguimiento de coaching fitness: rutinas, nutrición, asistencia y progreso." />
 
     <!-- Tema / status bar -->
     <meta name="theme-color" content="#0B0B0D" />
 
-    <!-- iOS: instalación tipo app -->
+    <!-- iOS / Android: instalación tipo app (standalone) -->
+    <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="CoachPro" />
-    <meta name="mobile-web-app-capable" content="yes" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="icon" type="image/png" sizes="192x192" href="/icons/icon-192.png" />
+
+    <!-- Base: fondo charcoal de extremo a extremo (sin franjas blancas en notch/gestos) -->
+    <style>
+      html, body { margin: 0; padding: 0; background-color: #0B0B0D; min-height: 100vh; min-height: 100dvh; }
+      #root { min-height: 100dvh; background-color: #0B0B0D; }
+    </style>
 
     <!-- Tabler Icons vía CDN -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.11.0/dist/tabler-icons.min.css" />

@@ -40,7 +40,7 @@ function ChatCoachHilo({ atleta, onBack }) {
   const { data: mensajes, isLoading } = useHilo(atleta.id)
   const enviar = useEnviarMensajeCoach(atleta.id)
   return (
-    <Screen pad={false} style={{ display: 'flex', flexDirection: 'column', height: '100dvh' }}>
+    <Screen pad={false} style={{ display: 'flex', flexDirection: 'column', height: '100dvh', paddingBottom: 'calc(64px + env(safe-area-inset-bottom))' }}>
       <div style={{ padding: `${space.md}px ${space.md}px 0` }}>
         <Header title={atleta.nombre} subtitle="Chat" onBack={onBack} />
       </div>
