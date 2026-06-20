@@ -29,7 +29,7 @@ const PROMPT =
   '(no por 100 g). Da números enteros realistas. Si la imagen no muestra comida, usa 0 en todo y ' +
   'confianza "baja". Responde únicamente llamando a la herramienta estimar_macros.'
 
-module.exports = async (req, res) => {
+export default async function handler(req, res) {
   if (req.method !== 'POST') {
     res.status(405).json({ error: 'Método no permitido' })
     return
