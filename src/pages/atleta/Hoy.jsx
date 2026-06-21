@@ -12,8 +12,10 @@ import {
 } from '../../lib/ui.jsx'
 import { colors, space, font, radius, scoreColor, SCORE_STREAK_UMBRAL } from '../../lib/theme.js'
 import { scoreDia, calcularRacha } from '../../lib/score.js'
+import { useBranding } from '../../lib/branding.jsx'
 
 export function Hoy({ token, onIrNutricion }) {
+  const { logoUrl, primary } = useBranding()
   const hoy = todayISO()
   const perfilQ = usePerfilYRutina(token, hoy)
   const sesionQ = usePortalSesionHoy(token, hoy)
@@ -75,9 +77,17 @@ export function Hoy({ token, onIrNutricion }) {
 
   return (
     <>
+      {/* Header del portal con logo del coach */}
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: space.md, minHeight: 36 }}>
+        {logoUrl
+          ? <img src={logoUrl} alt="Coach" style={{ height: 32, maxWidth: 140, objectFit: 'contain' }} />
+          : <span style={{ ...font.title, fontSize: 17, fontWeight: 700, color: primary }}>CoachPro</span>
+        }
+      </div>
+
       {/* Score protagonista */}
       <div style={{ textAlign: 'center', marginBottom: space.md }}>
-        <Overline color={colors.accent}>Hola, {atleta.nombre.split(' ')[0]}</Overline>
+        <Overline color={primary}>Hola, {atleta.nombre.split(' ')[0]}</Overline>
         <div style={{ marginTop: space.sm }}>
           <Ring value={score.total} label="Score de disciplina" />
         </div>

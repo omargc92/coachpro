@@ -8,18 +8,28 @@ import {
   Screen, Header, Card, Row, Stat, Avatar, Badge, Button, Sheet, Field, Select,
   Icon, Overline, Loading, Empty
 } from '../../lib/ui.jsx'
-import { colors, space, font, scoreColor, OBJETIVO_LABEL } from '../../lib/theme.js'
+import { colors, space, font, radius, scoreColor, OBJETIVO_LABEL } from '../../lib/theme.js'
+import { usePlan } from '../../lib/usePlan.jsx'
+import { PLANS } from '../../lib/plans.js'
 
 const OBJETIVOS = Object.entries(OBJETIVO_LABEL).map(([value, label]) => ({ value, label }))
 
 export function Atletas({ coach, onOpenAtleta, onOpenCatalogo }) {
   const { signOut } = useAuth()
   const { data: atletas, isLoading, error } = useAtletasResumen(coach)
+  const { canWrite, isReadOnly, canAddAthlete, plan } = usePlan()
   const [nuevo, setNuevo] = useState(false)
+  const [upgradeOpen, setUpgradeOpen] = useState(false)
 
   const total = atletas?.length || 0
   const enGym = atletas?.filter((a) => a.asistioHoy).length || 0
   const enRiesgo = atletas?.filter((a) => a.enRiesgo).length || 0
+
+  function handleNuevoAtleta() {
+    if (!canWrite) { setUpgradeOpen(true); return }
+    if (!canAddAthlete(total)) { setUpgradeOpen(true); return }
+    setNuevo(true)
+  }
 
   return (
     <Screen>
@@ -46,15 +56,41 @@ export function Atletas({ coach, onOpenAtleta, onOpenCatalogo }) {
         }
       />
 
+      {isReadOnly && (
+        <div style={{
+          display: 'flex', alignItems: 'center', gap: 8,
+          background: 'rgba(255,120,71,0.08)', border: `0.5px solid ${colors.danger}`,
+          borderRadius: radius.md, padding: `${space.sm}px ${space.md}px`, marginBottom: space.md
+        }}>
+          <Icon name="lock" size={16} color={colors.danger} />
+          <span style={{ ...font.small, color: colors.danger }}>Modo lectura — reactiva tu plan para editar</span>
+        </div>
+      )}
+
       <Row style={{ marginBottom: space.md }}>
         <Stat label="Atletas" value={total} />
         <Stat label="Hoy en gym" value={enGym} accent={colors.accent} />
         <Stat label="En riesgo" value={enRiesgo} accent={enRiesgo ? colors.danger : colors.title} />
       </Row>
 
-      <Button icon="user-plus" onClick={() => setNuevo(true)} style={{ marginBottom: space.lg }}>
+      <Button
+        icon="user-plus"
+        onClick={handleNuevoAtleta}
+        variant={isReadOnly || !canAddAthlete(total) ? 'ghost' : 'primary'}
+        style={{ marginBottom: space.lg }}
+      >
         Nuevo atleta
       </Button>
+
+      {/* Modal de upgrade */}
+      {upgradeOpen && (
+        <UpgradeSheet
+          onClose={() => setUpgradeOpen(false)}
+          isReadOnly={isReadOnly}
+          plan={plan}
+          maxAthletes={PLANS[plan]?.maxAthletes}
+        />
+      )}
 
       {isLoading && <Loading label="Cargando atletas…" />}
       {error && <Empty icon="alert-triangle" title="Error al cargar" hint={String(error.message || error)} />}
@@ -98,6 +134,29 @@ function AtletaCard({ a, onClick }) {
         <Overline style={{ fontSize: 9, marginTop: 2 }}>Score</Overline>
       </div>
     </Card>
+  )
+}
+
+function UpgradeSheet({ onClose, isReadOnly, plan, maxAthletes }) {
+  return (
+    <Sheet open onClose={onClose} title="Límite alcanzado">
+      <div style={{ textAlign: 'center', padding: `${space.md}px 0` }}>
+        <Icon name="crown" size={40} color={colors.accent} />
+        <div style={{ ...font.title, color: colors.title, marginTop: space.md }}>
+          {isReadOnly
+            ? 'Tu periodo de prueba terminó'
+            : `Límite de tu plan ${plan}`}
+        </div>
+        <div style={{ ...font.small, color: colors.muted, marginTop: 8 }}>
+          {isReadOnly
+            ? 'Reactiva tu plan para seguir creando y editando atletas.'
+            : `Tu plan actual permite hasta ${maxAthletes} atletas. Mejora para agregar más.`}
+        </div>
+      </div>
+      <Button icon="crown" onClick={onClose} style={{ marginTop: space.md }}>
+        Ver planes
+      </Button>
+    </Sheet>
   )
 }
 

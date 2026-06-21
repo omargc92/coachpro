@@ -11,15 +11,18 @@ import {
   Screen, Header, Card, Row, Overline, Bar, Button, Badge, Icon, Loading, Empty, Sheet, Field
 } from '../../lib/ui.jsx'
 import { colors, space, font, radius, OBJETIVO_LABEL, DIAS } from '../../lib/theme.js'
+import { usePlan } from '../../lib/usePlan.jsx'
 
-export function AtletaDetalle({ atletaId, onBack }) {
+export function AtletaDetalle({ atletaId, onBack, coach }) {
   const { data: at, isLoading } = useAtleta(atletaId)
   const { data: med } = useMediciones(atletaId)
   const { data: asign } = useAsignacionesAtleta(atletaId)
   const { data: act } = useAtletaActividad(atletaId)
   const guardarObjetivo = useGuardarObjetivoNutricion(atletaId)
-  const [copiado, setCopiado] = useState(false)
+  const { hasFeature } = usePlan()
+  const [copiado, setCopiado]         = useState(false)
   const [editObjetivo, setEditObjetivo] = useState(false)
+  const [exportando, setExportando]   = useState(false)
 
   if (isLoading || !at) return <Screen><Loading /></Screen>
 
@@ -32,6 +35,18 @@ export function AtletaDetalle({ atletaId, onBack }) {
     }
     setCopiado(true)
     setTimeout(() => setCopiado(false), 1800)
+  }
+
+  async function handleExportPDF() {
+    setExportando(true)
+    try {
+      const { exportarProgresoPDF } = await import('../../lib/exportPdf.js')
+      await exportarProgresoPDF({ atleta: at, mediciones: med ?? [], actividad: act, coach })
+    } catch (err) {
+      alert('Error al generar PDF: ' + (err.message || err))
+    } finally {
+      setExportando(false)
+    }
   }
 
   return (
@@ -102,6 +117,32 @@ export function AtletaDetalle({ atletaId, onBack }) {
           ))}
         </div>
       </Card>
+
+      {/* --- Export PDF (Premium) --- */}
+      {hasFeature('exportPdf')
+        ? (
+          <Button
+            variant="ghost"
+            icon={exportando ? 'loader-2' : 'file-type-pdf'}
+            onClick={handleExportPDF}
+            disabled={exportando}
+            style={{ marginBottom: space.sm }}
+          >
+            {exportando ? 'Generando PDF…' : 'Exportar progreso PDF'}
+          </Button>
+        )
+        : (
+          <div style={{
+            display: 'flex', alignItems: 'center', gap: 8,
+            background: colors.surface, border: `0.5px solid ${colors.border}`,
+            borderRadius: radius.md, padding: `${space.sm}px ${space.md}px`,
+            marginBottom: space.sm
+          }}>
+            <Icon name="lock" size={15} color={colors.hint} />
+            <span style={{ ...font.small, color: colors.muted }}>Export PDF disponible en plan Premium</span>
+          </div>
+        )
+      }
 
       {/* --- Chat (fase 4) --- */}
       <Button variant="ghost" icon="message-circle" disabled>
