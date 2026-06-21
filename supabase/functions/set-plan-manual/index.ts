@@ -1,6 +1,7 @@
 // Edge Function: set-plan-manual  ⚠️  SOLO DEV
-// Permite cambiar el plan sin Stripe. Deshabilitada en producción.
-// En prod, los cambios de plan SOLO ocurren vía stripe-webhook.
+// Permite cambiar el plan sin Stripe. Bloqueada por defecto (fail-closed):
+// solo opera si el secret ALLOW_MANUAL_PLAN === 'true' está presente.
+// En prod NO lo configures → los cambios de plan SOLO ocurren vía stripe-webhook.
 // Deploy: supabase functions deploy set-plan-manual
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -16,9 +17,9 @@ Deno.serve(async (req) => {
     })
   }
 
-  // Bloqueada en producción
-  if (Deno.env.get('ENVIRONMENT') === 'production') {
-    return new Response('Not available in production', { status: 403 })
+  // Fail-closed: deshabilitada salvo que se habilite explícitamente en dev.
+  if (Deno.env.get('ALLOW_MANUAL_PLAN') !== 'true') {
+    return new Response('Forbidden', { status: 403 })
   }
 
   const authHeader = req.headers.get('Authorization')
