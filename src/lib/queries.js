@@ -780,3 +780,83 @@ export async function subirFoto(file, carpeta = 'platos') {
   const { data } = supabase.storage.from('fotos').getPublicUrl(nombre)
   return data.publicUrl
 }
+
+// ---------- ONBOARDING ----------
+
+export function useCompletarOnboarding() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (coachId) => {
+      const { error } = await supabase
+        .from('coaches')
+        .update({ onboarding_completado: true })
+        .eq('id', coachId)
+      if (error) throw error
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['coach'] })
+  })
+}
+
+// ---------- SUSCRIPCIÓN ----------
+
+export function useSubscription(coachId) {
+  return useQuery({
+    queryKey: ['subscription', coachId],
+    enabled: !!coachId,
+    staleTime: 60_000,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('subscriptions')
+        .select('*')
+        .eq('coach_id', coachId)
+        .single()
+      if (error) throw error
+      return data
+    }
+  })
+}
+
+// ---------- BRANDING DEL COACH ----------
+
+// Sube el logo al bucket coach-logos y devuelve la URL pública.
+// Elimina el logo anterior si existe para no acumular archivos huérfanos.
+export async function subirLogo(file, coachId) {
+  const ext = (file.name?.split('.').pop() || 'png').toLowerCase()
+  const nombre = `${coachId}/logo.${ext}`
+  const { error } = await supabase.storage
+    .from('coach-logos')
+    .upload(nombre, file, { cacheControl: '31536000', upsert: true })
+  if (error) throw error
+  const { data } = supabase.storage.from('coach-logos').getPublicUrl(nombre)
+  // Rompe la caché del navegador añadiendo un timestamp.
+  return `${data.publicUrl}?v=${Date.now()}`
+}
+
+// Guarda logo_url, brand_primary y brand_accent en el perfil del coach.
+export function useActualizarBranding(coach) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ logo_url, brand_primary, brand_accent }) => {
+      const { error } = await supabase
+        .from('coaches')
+        .update({ logo_url, brand_primary, brand_accent })
+        .eq('id', coach.id)
+      if (error) throw error
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['coach', coach.auth_user_id] })
+  })
+}
+
+// Branding del coach propietario de un portal de atleta (por token).
+export function usePortalBranding(token) {
+  return useQuery({
+    queryKey: ['portal', 'branding', token],
+    enabled: !!token,
+    staleTime: 5 * 60 * 1000,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('portal_branding', { p_token: token })
+      if (error) throw error
+      return data
+    }
+  })
+}

@@ -3,13 +3,34 @@
 // ============================================================
 import { useState } from 'react'
 import { useConversaciones, useHilo, useEnviarMensajeCoach } from '../../lib/queries.js'
-import { Screen, Header, Card, Avatar, Badge, Loading, Empty } from '../../lib/ui.jsx'
+import { Screen, Header, Card, Avatar, Badge, Loading, Empty, Icon } from '../../lib/ui.jsx'
 import { ChatThread } from '../../lib/chat.jsx'
-import { colors, space, font } from '../../lib/theme.js'
+import { colors, space, font, radius } from '../../lib/theme.js'
+import { usePlan } from '../../lib/usePlan.jsx'
 
 export function ChatCoach({ coach }) {
   const { data, isLoading } = useConversaciones(coach)
+  const { hasFeature } = usePlan()
   const [activo, setActivo] = useState(null) // {id, nombre}
+
+  if (!hasFeature('chat')) {
+    return (
+      <Screen>
+        <Header title="Chat" subtitle="Conversaciones" />
+        <div style={{
+          textAlign: 'center', padding: `${space.xl}px ${space.md}px`,
+          border: `0.5px solid ${colors.border}`, borderRadius: radius.lg,
+          background: colors.surface2
+        }}>
+          <Icon name="lock" size={36} color={colors.hint} />
+          <div style={{ ...font.title, color: colors.body, marginTop: space.md }}>Chat no disponible</div>
+          <div style={{ ...font.small, color: colors.muted, marginTop: 8 }}>
+            El chat está incluido en los planes Pro y Premium. Reactiva tu plan para usar esta función.
+          </div>
+        </div>
+      </Screen>
+    )
+  }
 
   if (activo) return <ChatCoachHilo atleta={activo} onBack={() => setActivo(null)} />
 

@@ -4,6 +4,8 @@
 import { Suspense, lazy, useState } from 'react'
 import { Screen, BottomNav, Loading } from '../../lib/ui.jsx'
 import { InstallBanner } from '../../lib/pwa.jsx'
+import { BrandingProvider } from '../../lib/branding.jsx'
+import { usePortalBranding } from '../../lib/queries.js'
 import { Hoy } from './Hoy.jsx'
 import { Nutricion } from './Nutricion.jsx'
 import { ChatAtleta } from './ChatAtleta.jsx'
@@ -20,21 +22,23 @@ const NAV = [
 
 export function AtletaPortal({ token }) {
   const [tab, setTab] = useState('hoy')
+  const brandingQ = usePortalBranding(token)
+  const branding = brandingQ.data || null
 
   // El chat ocupa toda la altura (input fijo abajo).
   if (tab === 'chat') {
     return (
-      <>
+      <BrandingProvider branding={branding}>
         <Screen pad={false} style={{ display: 'flex', flexDirection: 'column', height: '100dvh', paddingBottom: 'calc(64px + env(safe-area-inset-bottom))' }}>
           <ChatAtleta token={token} />
         </Screen>
         <BottomNav items={NAV} active={tab} onChange={setTab} />
-      </>
+      </BrandingProvider>
     )
   }
 
   return (
-    <>
+    <BrandingProvider branding={branding}>
       <Screen>
         <InstallBanner />
         {tab === 'hoy' && <Hoy token={token} onIrNutricion={() => setTab('nutricion')} />}
@@ -46,6 +50,6 @@ export function AtletaPortal({ token }) {
         )}
       </Screen>
       <BottomNav items={NAV} active={tab} onChange={setTab} />
-    </>
+    </BrandingProvider>
   )
 }

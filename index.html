@@ -3,8 +3,61 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <title>CoachPro</title>
-    <meta name="description" content="Seguimiento de coaching fitness: rutinas, nutrición, asistencia y progreso." />
+    <title>CoachPro — Plataforma de coaching fitness</title>
+    <meta name="description" content="Gestiona rutinas, nutrición, asistencia y progreso de tus atletas. Trial gratis 14 días sin tarjeta. Planes desde $299 MXN/mes." />
+    <meta name="keywords" content="coaching fitness, entrenador personal, app gym, seguimiento atletas, rutinas, nutrición" />
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="CoachPro — Plataforma de coaching fitness" />
+    <meta property="og:description" content="Gestiona rutinas, nutrición y progreso de tus atletas. Trial gratis 14 días." />
+    <meta property="og:type" content="website" />
+
+    <!-- JSON-LD: Producto con ofertas -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "CoachPro",
+      "description": "Plataforma de coaching fitness: rutinas, nutrición, asistencia y progreso de atletas.",
+      "applicationCategory": "HealthApplication",
+      "operatingSystem": "Web, iOS, Android",
+      "offers": [
+        {
+          "@type": "Offer",
+          "name": "Trial",
+          "price": "0",
+          "priceCurrency": "MXN",
+          "description": "14 días gratis, hasta 3 atletas, sin tarjeta requerida"
+        },
+        {
+          "@type": "Offer",
+          "name": "Pro",
+          "price": "299",
+          "priceCurrency": "MXN",
+          "priceSpecification": {
+            "@type": "UnitPriceSpecification",
+            "price": "299",
+            "priceCurrency": "MXN",
+            "unitCode": "MON"
+          },
+          "description": "Hasta 25 atletas, chat, logo propio, dashboard de negocio"
+        },
+        {
+          "@type": "Offer",
+          "name": "Premium",
+          "price": "599",
+          "priceCurrency": "MXN",
+          "priceSpecification": {
+            "@type": "UnitPriceSpecification",
+            "price": "599",
+            "priceCurrency": "MXN",
+            "unitCode": "MON"
+          },
+          "description": "Atletas ilimitados, colores white-label, export PDF de progreso"
+        }
+      ]
+    }
+    </script>
 
     <!-- Tema / status bar -->
     <meta name="theme-color" content="#0B0B0D" />
