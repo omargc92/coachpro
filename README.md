@@ -28,6 +28,7 @@ Stripe Billing · PWA (`vite-plugin-pwa`) · Claude (visión, estimación de mac
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Modelo de datos, RLS/seguridad, Edge Functions, planes |
 | [docs/despliegue.md](docs/despliegue.md) | Runbook de producción (Supabase + Stripe + Vercel) |
 | [CONTRIBUTING.md](CONTRIBUTING.md) | Flujo de trabajo, ramas, PRs, convenciones |
+| [docs/ayuda/](docs/ayuda/) | **Centro de ayuda para usuarios** (guías de coach y atleta) |
 | [DESIGN.md](DESIGN.md) | Design system (paleta, tipografía, componentes) |
 | [SECURITY.md](SECURITY.md) | Runbook de seguridad y rotación de credenciales |
 | [QA.md](QA.md) | Checklist de QA manual |
