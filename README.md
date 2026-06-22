@@ -57,9 +57,8 @@ Stripe Billing · PWA (`vite-plugin-pwa`) · Claude (visión, estimación de mac
    - `0005_fase_d_onboarding.sql` — flag `onboarding_completado`.
    - `0006_fase_b_paywall_server.sql` — **enforcement server-side** del paywall.
 3. **Crea el usuario coach** (Authentication → Users → Add user, o "Crear cuenta" en la app).
-4. **Seed demo** *(opcional)*: ajusta `v_email` en [`supabase/seed.sql`](supabase/seed.sql)
-   al email del coach y ejecútalo. Crea 3 atletas (Ana, Luis, Marta), catálogo, una rutina
-   asignada, nutrición, mediciones y mensajes; imprime los tokens de portal.
+4. **Empieza de cero**: no hay datos precargados. El coach da de alta su propio catálogo de
+   ejercicios, atletas y rutinas desde la app (Catálogo → "Nuevo ejercicio", etc.).
 
 #### Buckets de Storage
 | Bucket | Público | Uso | Políticas |
@@ -84,7 +83,7 @@ npm install
 npm run dev
 ```
 - **Coach:** `http://localhost:5173` → login.
-- **Atleta:** `http://localhost:5173/?token=UUID` (token del seed).
+- **Atleta:** `http://localhost:5173/?token=UUID` (token que genera la app al crear un atleta).
 
 ---
 
@@ -125,7 +124,6 @@ src/
 supabase/
   migrations/  0001…0006 + EJECUTAR_EN_SUPABASE.sql
   functions/   create-checkout-session · create-portal-session · stripe-webhook · set-plan-manual
-  seed.sql
 scripts/
   gen-icons.sh             Iconos PWA + logo
   rotar-credenciales.mjs   Rota credenciales demo (ver SECURITY.md)
