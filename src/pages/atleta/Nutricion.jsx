@@ -1,6 +1,6 @@
 // ============================================================
 // Portal atleta — NUTRICIÓN: macros del día, comidas por momento,
-// sugerencia, foto del plato (Storage) y búsqueda (stub).
+// foto del plato (Storage) y búsqueda en Open Food Facts.
 // ============================================================
 import { useRef, useState } from 'react'
 import { usePortalNutricion, useRegistrarComida, subirFoto, todayISO } from '../../lib/queries.js'
@@ -152,41 +152,12 @@ function ComidaSheet({ open, onClose, foto, onGuardar, guardando }) {
   const vacio = { momento: 'comida', descripcion: '', kcal: '', proteina_g: '', carbos_g: '', grasas_g: '' }
   const [f, setF] = useState(vacio)
   const [buscando, setBuscando] = useState(false)
-  const [estimando, setEstimando] = useState(false)
   const set = (k) => (v) => setF((p) => ({ ...p, [k]: v }))
 
   function cerrar() {
     setF(vacio)
     setBuscando(false)
-    setEstimando(false)
     onClose()
-  }
-
-  // Estima macros desde la foto vía /api/estimar-macros (Claude visión).
-  async function estimarConIA() {
-    if (!foto || estimando) return
-    setEstimando(true)
-    try {
-      const res = await fetch('/api/estimar-macros', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({ imageUrl: foto })
-      })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data?.error || 'No se pudo estimar')
-      setF((p) => ({
-        ...p,
-        descripcion: p.descripcion || data.descripcion || '',
-        kcal: String(data.kcal ?? ''),
-        proteina_g: String(data.proteina_g ?? ''),
-        carbos_g: String(data.carbos_g ?? ''),
-        grasas_g: String(data.grasas_g ?? '')
-      }))
-    } catch (e) {
-      alert('No se pudo estimar con IA: ' + (e.message || e))
-    } finally {
-      setEstimando(false)
-    }
   }
 
   function guardar() {
@@ -225,12 +196,7 @@ function ComidaSheet({ open, onClose, foto, onGuardar, guardando }) {
   return (
     <Sheet open={open} onClose={cerrar} title="Agregar comida">
       {foto && (
-        <>
-          <img src={foto} alt="" style={{ width: '100%', height: 160, objectFit: 'cover', borderRadius: radius.md, marginBottom: space.sm }} />
-          <Button variant="surface" icon="sparkles" onClick={estimarConIA} disabled={estimando} style={{ marginBottom: space.md }}>
-            {estimando ? 'Estimando…' : 'Estimar macros con IA'}
-          </Button>
-        </>
+        <img src={foto} alt="" style={{ width: '100%', height: 160, objectFit: 'cover', borderRadius: radius.md, marginBottom: space.md }} />
       )}
       <Select label="Momento" value={f.momento} onChange={set('momento')} options={MOMENTOS} />
       <Field label="Descripción" value={f.descripcion} onChange={set('descripcion')} placeholder="Ej. Pollo con arroz" />
@@ -248,7 +214,7 @@ function ComidaSheet({ open, onClose, foto, onGuardar, guardando }) {
         <div style={{ flex: 1 }}><Field label="Grasas (g)" type="number" value={f.grasas_g} onChange={set('grasas_g')} placeholder="0" /></div>
       </Row>
       <div style={{ ...font.small, color: colors.hint, marginBottom: space.md }}>
-        Búsqueda (Open Food Facts) y estimación por foto (IA) son orientativas; tu coach valida los macros.
+        La búsqueda (Open Food Facts) es orientativa; tu coach valida los macros.
       </div>
       <Button icon="check" onClick={guardar} disabled={guardando}>
         {guardando ? 'Guardando…' : 'Guardar comida'}

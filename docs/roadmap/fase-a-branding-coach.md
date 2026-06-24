@@ -1,4 +1,4 @@
-Fase A — Branding por coach (logo propio + colores white-label)
+Fase A — Branding por coach (logo propio + colores white-label) ✅ COMPLETADA
 
 Contexto: CoachPro, React 18 + Vite + Supabase + Vercel, inline styles (no Tailwind). Design system base: charcoal #0B0B0D, electric lime, alert orange. Multi-tenant: cada coach es un tenant. Quiero que cada coach pueda subir su propio logo y (en plan Premium, luego) personalizar colores. Esta fase NO incluye el gating por plan todavía — solo la capacidad técnica de branding. El gating se conecta en la Fase B.
 
@@ -23,3 +23,19 @@ Contexto: CoachPro, React 18 + Vite + Supabase + Vercel, inline styles (no Tailw
 - Optimiza: no recargues el logo en cada render; cachéalo vía TanStack Query.
 
 Entregable: documenta columnas/bucket creados, archivos tocados, y cómo probar (subir logo como coach demo → abrir portal de atleta y ver el branding aplicado). Build + deploy a Vercel.
+
+---
+
+## Implementación
+
+**Migración:** `supabase/migrations/0003_fase_a_branding.sql`
+- Bucket `coach-logos` con RLS (cada coach solo sube/borra en su propio path).
+- Columnas `logo_url`, `brand_primary`, `brand_accent` en tabla de coaches.
+
+**Archivos creados/modificados:**
+- `src/lib/branding.jsx` — `BrandingProvider` + `useBranding` hook; fallback a defaults del design system.
+- `src/pages/coach/Configuracion.jsx` — sección "Marca": uploader (PNG/JPG/SVG, máx 1 MB, preview, validación), color pickers, botón "Restaurar marca por defecto".
+- Portal del atleta — header muestra logo del coach (si existe); acentos aplicados desde `useBranding`.
+- `src/lib/queries.js` — `useActualizarBranding`, `subirLogo` cacheados vía TanStack Query.
+
+**Nota:** el gating de logo/colores según plan se conectó en Fase B (`hasFeature('ownLogo')` / `hasFeature('customColors')`).

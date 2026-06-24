@@ -860,3 +860,69 @@ export function usePortalBranding(token) {
     }
   })
 }
+
+// ---------- FOTOS DE PROGRESO ----------
+
+// Atleta: lee su historial de fotos de progreso (vía RPC por token).
+export function usePortalFotosProgreso(token) {
+  return useQuery({
+    queryKey: ['portal', 'fotos-progreso', token],
+    enabled: !!token,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('portal_fotos_progreso', { p_token: token })
+      if (error) throw error
+      return data ?? []
+    }
+  })
+}
+
+// Atleta: registra una nueva foto de progreso (vía RPC por token).
+export function useAgregarFotoProgreso(token) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ foto_url, nota }) => {
+      const { error } = await supabase.rpc('portal_agregar_foto_progreso', {
+        p_token: token,
+        p_foto_url: foto_url,
+        p_nota: nota ?? null
+      })
+      if (error) throw error
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['portal', 'fotos-progreso', token] })
+  })
+}
+
+// Coach: lee las fotos de progreso de un atleta (acceso directo con RLS).
+export function useFotosProgresoCoach(atletaId) {
+  return useQuery({
+    queryKey: ['fotos-progreso', atletaId],
+    enabled: !!atletaId,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('fotos_progreso')
+        .select('id, foto_url, nota, fecha')
+        .eq('atleta_id', atletaId)
+        .order('fecha', { ascending: false })
+        .order('created_at', { ascending: false })
+      if (error) throw error
+      return data ?? []
+    }
+  })
+}
+
+// ---------- ARCHIVAR ATLETA ----------
+
+// Coach: desactiva un atleta (soft delete — los datos se conservan).
+export function useArchivarAtleta(coachId) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (atletaId) => {
+      const { error } = await supabase
+        .from('atletas')
+        .update({ activo: false })
+        .eq('id', atletaId)
+      if (error) throw error
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['atletas-resumen', coachId] })
+  })
+}

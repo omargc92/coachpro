@@ -125,7 +125,14 @@ scripts/    gen-icons.sh (genera iconos PWA + logo desde public/logo-source.png)
 
 ## Fases de construcción
 
+### Producto base
 - **Fase 1:** scaffold + Supabase + migración + auth coach + seed + PWA base. ✅
 - **Fase 2:** portal entrenador (atletas, detalle, catálogo). ✅
 - **Fase 3:** rutinas (builder + asignación) + portal atleta "Hoy" + Score de Disciplina. ✅
 - **Fase 4:** nutrición (objetivos, comidas, foto a Storage) + progreso (Recharts) + chat. ✅
+
+### SaaS y monetización
+- **Fase A:** branding por coach — logo propio + colores white-label en portal del atleta. ✅
+- **Fase B:** modelo de planes (Trial/Pro/Premium), gating de features y límite de atletas. ✅
+- **Fase C:** Stripe Billing — suscripciones recurrentes en MXN, webhooks, Customer Portal. ✅
+- **Fase D:** onboarding guiado, landing pública con precios, dashboard de negocio, export PDF. ✅
