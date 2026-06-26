@@ -24,8 +24,21 @@ jobs:
   qa:
     # En cualquier deploy exitoso (producción O preview), o ejecución manual.
     # El QA prueba environment_url, que Vercel rellena tanto en prod como en preview.
-    # Nota: si activas "Deployment Protection" en Vercel, las URLs de preview quedan
-    # tras auth y el QA fallaría; ahí conviene volver a restringir a Production.
+    #
+    # ── PENDIENTE DE CONFIGURAR (requiere acceso admin) ───────────────────────
+    # Para que el QA pueda entrar a las URLs de preview protegidas por Vercel,
+    # se necesita configurar el bypass secret en DOS lugares:
+    #
+    # 1. Vercel Dashboard → Project "coachpro" → Settings → Deployment Protection
+    #    → activar "Protection Bypass for Automation" → copiar el secret generado
+    #
+    # 2. GitHub → repositorio omargc92/coachpro → Settings → Secrets and variables
+    #    → Actions → New repository secret
+    #    Nombre:  VERCEL_AUTOMATION_BYPASS_SECRET
+    #    Valor:   (el secret copiado de Vercel en el paso anterior)
+    #
+    # Sin esto el QA seguirá fallando en PRs (pero la app en producción sigue bien).
+    # ──────────────────────────────────────────────────────────────────────────
     if: >-
       github.event_name == 'workflow_dispatch' ||
       github.event.deployment_status.state == 'success'
