@@ -55,6 +55,8 @@ jobs:
           QA_COACH_EMAIL: ${{ secrets.QA_COACH_EMAIL || 'coach@coachpro.app' }}
           QA_COACH_PASS: ${{ secrets.QA_COACH_PASS }}
           QA_TOKEN: ${{ secrets.QA_TOKEN }}
+          # Bypass de Vercel Deployment Protection para previews (Settings → Deployment Protection → Protection Bypass for Automation).
+          VERCEL_BYPASS_SECRET: ${{ secrets.VERCEL_AUTOMATION_BYPASS_SECRET }}
         run: npm run qa
 
       - name: Subir capturas
