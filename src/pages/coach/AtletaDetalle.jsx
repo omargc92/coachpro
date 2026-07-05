@@ -5,7 +5,8 @@
 import { useState } from 'react'
 import { LineChart, Line, ResponsiveContainer, YAxis, XAxis, Tooltip } from 'recharts'
 import {
-  useAtleta, useMediciones, useAsignacionesAtleta, useAtletaActividad, useGuardarObjetivoNutricion
+  useAtleta, useMediciones, useAsignacionesAtleta, useAtletaActividad,
+  useGuardarObjetivoNutricion, useFotosProgresoCoach, useArchivarAtleta
 } from '../../lib/queries.js'
 import {
   Screen, Header, Card, Row, Overline, Bar, Button, Badge, Icon, Loading, Empty, Sheet, Field
@@ -18,11 +19,14 @@ export function AtletaDetalle({ atletaId, onBack, coach }) {
   const { data: med } = useMediciones(atletaId)
   const { data: asign } = useAsignacionesAtleta(atletaId)
   const { data: act } = useAtletaActividad(atletaId)
+  const { data: fotos } = useFotosProgresoCoach(atletaId)
   const guardarObjetivo = useGuardarObjetivoNutricion(atletaId)
+  const archivar = useArchivarAtleta(coach?.id)
   const { hasFeature } = usePlan()
-  const [copiado, setCopiado]         = useState(false)
-  const [editObjetivo, setEditObjetivo] = useState(false)
-  const [exportando, setExportando]   = useState(false)
+  const [copiado, setCopiado]             = useState(false)
+  const [editObjetivo, setEditObjetivo]   = useState(false)
+  const [exportando, setExportando]       = useState(false)
+  const [confirmEliminar, setConfirmEliminar] = useState(false)
 
   if (isLoading || !at) return <Screen><Loading /></Screen>
 
@@ -69,6 +73,10 @@ export function AtletaDetalle({ atletaId, onBack, coach }) {
       {/* --- Mediciones --- */}
       <SeccionTitulo>Mediciones</SeccionTitulo>
       <Mediciones med={med} />
+
+      {/* --- Fotos de progreso --- */}
+      <SeccionTitulo>Fotos de progreso</SeccionTitulo>
+      <FotosProgreso fotos={fotos} />
 
       {/* --- Rutina asignada --- */}
       <SeccionTitulo>Rutina asignada</SeccionTitulo>
@@ -144,9 +152,14 @@ export function AtletaDetalle({ atletaId, onBack, coach }) {
         )
       }
 
-      {/* --- Chat (fase 4) --- */}
-      <Button variant="ghost" icon="message-circle" disabled>
-        Abrir chat (Fase 4)
+      {/* --- Eliminar atleta --- */}
+      <Button
+        variant="ghost"
+        icon="trash"
+        onClick={() => setConfirmEliminar(true)}
+        style={{ color: colors.danger, marginBottom: space.sm }}
+      >
+        Eliminar atleta
       </Button>
 
       {editObjetivo && (
@@ -159,7 +172,69 @@ export function AtletaDetalle({ atletaId, onBack, coach }) {
           guardando={guardarObjetivo.isPending}
         />
       )}
+
+      {confirmEliminar && (
+        <Sheet open onClose={() => setConfirmEliminar(false)} title="Eliminar atleta">
+          <div style={{ ...font.body, color: colors.body, marginBottom: space.md }}>
+            ¿Eliminar a <b style={{ color: colors.title }}>{at.nombre}</b>? Sus datos se conservan
+            pero dejará de aparecer en la app.
+          </div>
+          <Button
+            icon="trash"
+            onClick={() =>
+              archivar.mutate(atletaId, {
+                onSuccess: () => { setConfirmEliminar(false); onBack() }
+              })
+            }
+            disabled={archivar.isPending}
+            style={{ background: colors.danger, marginBottom: space.sm }}
+          >
+            {archivar.isPending ? 'Eliminando…' : 'Sí, eliminar'}
+          </Button>
+          <Button variant="ghost" onClick={() => setConfirmEliminar(false)}>Cancelar</Button>
+        </Sheet>
+      )}
     </Screen>
+  )
+}
+
+function FotosProgreso({ fotos }) {
+  if (!fotos) return <Loading />
+  if (fotos.length === 0)
+    return (
+      <Card style={{ marginBottom: space.lg }}>
+        <Vacio>El atleta aún no ha subido fotos de progreso.</Vacio>
+      </Card>
+    )
+  return (
+    <div
+      style={{
+        display: 'flex',
+        gap: space.sm,
+        overflowX: 'auto',
+        paddingBottom: space.sm,
+        marginBottom: space.lg,
+        WebkitOverflowScrolling: 'touch'
+      }}
+    >
+      {fotos.map((f) => (
+        <div key={f.id} style={{ flexShrink: 0, width: 120 }}>
+          <img
+            src={f.foto_url}
+            alt={f.nota || f.fecha}
+            style={{ width: 120, height: 160, objectFit: 'cover', borderRadius: radius.md, display: 'block' }}
+          />
+          <div style={{ ...font.small, color: colors.muted, marginTop: 4, textAlign: 'center' }}>
+            {fechaCorta(f.fecha)}
+          </div>
+          {f.nota && (
+            <div style={{ ...font.small, color: colors.hint, textAlign: 'center', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+              {f.nota}
+            </div>
+          )}
+        </div>
+      ))}
+    </div>
   )
 }
 

@@ -56,6 +56,7 @@ Stripe Billing · PWA (`vite-plugin-pwa`) · Claude (visión, estimación de mac
    - `0004_fase_b_planes.sql` — tabla `subscriptions`, enums de plan, trigger de trial.
    - `0005_fase_d_onboarding.sql` — flag `onboarding_completado`.
    - `0006_fase_b_paywall_server.sql` — **enforcement server-side** del paywall.
+   - `0007_fotos_progreso.sql` — tabla `fotos_progreso` + RPCs del portal + RLS del coach.
 3. **Crea el usuario coach** (Authentication → Users → Add user, o "Crear cuenta" en la app).
 4. **Empieza de cero**: no hay datos precargados. El coach da de alta su propio catálogo de
    ejercicios, atletas y rutinas desde la app (Catálogo → "Nuevo ejercicio", etc.).
@@ -122,7 +123,7 @@ src/
               Agenda, ChatCoach, Dashboard (negocio), Planes, Configuracion
     atleta/   Portal, Hoy, Nutricion, Progreso, ChatAtleta
 supabase/
-  migrations/  0001…0006 + EJECUTAR_EN_SUPABASE.sql
+  migrations/  0001…0007 + EJECUTAR_EN_SUPABASE.sql
   functions/   create-checkout-session · create-portal-session · stripe-webhook · set-plan-manual
 scripts/
   gen-icons.sh             Iconos PWA + logo
@@ -150,10 +151,17 @@ las migraciones + desplegar las Edge Functions + secrets de Stripe. El paso a pa
 ---
 
 ## Roadmap (fases construidas)
-- **Fase 1–4:** scaffold, portal coach, rutinas + Score, nutrición + progreso + chat. ✅
-- **Fase A:** branding por coach (logo + colores white-label). ✅
-- **Fase B:** planes, estados de suscripción y *gating* (cliente + servidor). ✅
-- **Fase C:** Stripe Billing (suscripciones recurrentes en MXN). ✅
-- **Fase D:** onboarding + mejoras de activación/retención. ✅
+
+### Producto base
+- **Fase 1:** scaffold + Supabase + migración + auth coach + seed + PWA base. ✅
+- **Fase 2:** portal entrenador (atletas, detalle, catálogo). ✅
+- **Fase 3:** rutinas (builder + asignación) + portal atleta "Hoy" + Score de Disciplina. ✅
+- **Fase 4:** nutrición (objetivos, comidas, foto a Storage) + progreso (Recharts) + chat. ✅
+
+### SaaS y monetización
+- **Fase A:** branding por coach — logo propio + colores white-label en portal del atleta. ✅
+- **Fase B:** modelo de planes (Trial/Pro/Premium), gating de features y límite de atletas. ✅
+- **Fase C:** Stripe Billing — suscripciones recurrentes en MXN, webhooks, Customer Portal. ✅
+- **Fase D:** onboarding guiado, landing pública con precios, dashboard de negocio, export PDF. ✅
 
 Specs detalladas en [docs/roadmap/](docs/roadmap/).

@@ -2,10 +2,10 @@
 // Portal atleta — PROGRESO: gráfica de peso/medidas + historial.
 // (Lazy-loaded por Recharts.)
 // ============================================================
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { LineChart, Line, ResponsiveContainer, YAxis, XAxis, Tooltip } from 'recharts'
-import { usePortalProgreso } from '../../lib/queries.js'
-import { Card, Overline, Badge, Icon, Loading, Empty, Row } from '../../lib/ui.jsx'
+import { usePortalProgreso, usePortalFotosProgreso, useAgregarFotoProgreso, subirFoto } from '../../lib/queries.js'
+import { Card, Overline, Badge, Button, Icon, Loading, Empty, Row } from '../../lib/ui.jsx'
 import { colors, space, font, radius } from '../../lib/theme.js'
 
 const METRICAS = [
@@ -16,11 +16,36 @@ const METRICAS = [
 
 export function Progreso({ token }) {
   const { data, isLoading } = usePortalProgreso(token)
+  const { data: fotos, isLoading: fotosLoading } = usePortalFotosProgreso(token)
+  const agregarFoto = useAgregarFotoProgreso(token)
+  const fileRef = useRef(null)
+  const [subiendo, setSubiendo] = useState(false)
   const [metrica, setMetrica] = useState('peso_kg')
+
+  async function onFile(e) {
+    const file = e.target.files?.[0]
+    e.target.value = ''
+    if (!file) return
+    setSubiendo(true)
+    try {
+      const foto_url = await subirFoto(file, 'progreso')
+      await agregarFoto.mutateAsync({ foto_url, nota: null })
+    } catch (err) {
+      alert('No se pudo subir la foto: ' + (err.message || err))
+    } finally {
+      setSubiendo(false)
+    }
+  }
 
   if (isLoading) return <Loading label="Cargando progreso…" />
   if (!data || data.length === 0)
-    return <Empty icon="chart-line" title="Sin mediciones" hint="Tu coach registrará tus mediciones." />
+    return (
+      <>
+        <Empty icon="chart-line" title="Sin mediciones" hint="Tu coach registrará tus mediciones." />
+        <FotosProgresoAtleta fotos={fotos} fotosLoading={fotosLoading} fileRef={fileRef} subiendo={subiendo} />
+        <input ref={fileRef} type="file" accept="image/*" capture="environment" onChange={onFile} style={{ display: 'none' }} />
+      </>
+    )
 
   const m = METRICAS.find((x) => x.key === metrica)
   const serie = data.filter((d) => d[metrica] != null).map((d) => ({ fecha: fechaCorta(d.fecha), v: Number(d[metrica]) }))
@@ -98,7 +123,7 @@ export function Progreso({ token }) {
 
       {/* Historial */}
       <Overline style={{ marginBottom: space.sm }}>Historial</Overline>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: space.xs }}>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: space.xs, marginBottom: space.xl }}>
         {[...data].reverse().map((d) => (
           <Card key={d.id} style={{ display: 'flex', alignItems: 'center', gap: space.sm, padding: '10px 12px' }}>
             <Badge color={colors.hint} style={{ minWidth: 54, justifyContent: 'center' }}>{fechaCorta(d.fecha)}</Badge>
@@ -107,6 +132,57 @@ export function Progreso({ token }) {
           </Card>
         ))}
       </div>
+
+      <FotosProgresoAtleta fotos={fotos} fotosLoading={fotosLoading} fileRef={fileRef} subiendo={subiendo} />
+      <input ref={fileRef} type="file" accept="image/*" capture="environment" onChange={onFile} style={{ display: 'none' }} />
+    </>
+  )
+}
+
+function FotosProgresoAtleta({ fotos, fotosLoading, fileRef, subiendo }) {
+  return (
+    <>
+      <Overline color={colors.accent} style={{ marginBottom: space.sm }}>Fotos de progreso</Overline>
+      <Button
+        icon={subiendo ? 'loader-2' : 'camera'}
+        onClick={() => fileRef.current?.click()}
+        disabled={subiendo}
+        style={{ marginBottom: space.md }}
+      >
+        {subiendo ? 'Subiendo…' : 'Agregar foto de progreso'}
+      </Button>
+
+      {fotosLoading && <Loading />}
+      {!fotosLoading && fotos?.length === 0 && (
+        <div style={{ ...font.small, color: colors.muted, textAlign: 'center', marginBottom: space.lg }}>
+          Aún no tienes fotos. Tómate una para ver tu evolución.
+        </div>
+      )}
+      {fotos && fotos.length > 0 && (
+        <div
+          style={{
+            display: 'flex',
+            gap: space.sm,
+            overflowX: 'auto',
+            paddingBottom: space.sm,
+            marginBottom: space.lg,
+            WebkitOverflowScrolling: 'touch'
+          }}
+        >
+          {fotos.map((f) => (
+            <div key={f.id} style={{ flexShrink: 0, width: 110 }}>
+              <img
+                src={f.foto_url}
+                alt={f.fecha}
+                style={{ width: 110, height: 150, objectFit: 'cover', borderRadius: radius.md, display: 'block' }}
+              />
+              <div style={{ ...font.small, color: colors.muted, marginTop: 4, textAlign: 'center' }}>
+                {fechaCorta(f.fecha)}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </>
   )
 }

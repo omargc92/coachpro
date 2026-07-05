@@ -1,4 +1,4 @@
-Fase B — Modelo de planes, estados de suscripción y gating (SIN cobro todavía)
+Fase B — Modelo de planes, estados de suscripción y gating ✅ COMPLETADA
 
 Contexto: continúa de Fase A. Mismo stack. Ahora construimos la lógica de planes y los límites, con un flag MANUAL de plan (sin Stripe aún) para poder probar todo antes de conectar el cobro en Fase C.
 
@@ -39,3 +39,30 @@ PLANES:
 - Pantalla que muestre los 3 planes (tabla comparativa), el plan actual del coach resaltado, y botón "Elegir plan" (en Fase C disparará Stripe; por ahora llama a la Edge Function manual para cambiar de plan y poder probar todos los estados).
 
 Reglas: inline styles, sin Tailwind. El gating debe fallar CERRADO (ante duda, restringe). No confíes solo en el cliente: la verdad del plan vive en Supabase y se valida con RLS; el gating de UI es UX, no seguridad. Documenta el modelo de datos y cómo simular cada estado (trial activo, trial vencido, pro, premium) con la Edge Function manual. Build + deploy.
+
+---
+
+## Implementación
+
+**Migración:** `supabase/migrations/0004_fase_b_planes.sql`
+- Tabla `subscriptions`: `plan` (enum trial/expired/pro/premium), `status` (active/read_only),
+  `trial_ends_at`, `current_period_end`, `stripe_customer_id`, `stripe_subscription_id`.
+- Trigger: al insertar un coach nuevo → inicializa `plan=trial`, `trial_ends_at = now()+14d`.
+- RLS: cada coach solo lee su propia suscripción; escritura solo vía service role.
+
+**Archivos creados/modificados:**
+- `src/lib/plans.js` — fuente única de verdad: matriz de planes con `maxAthletes`, `features`, `canWrite`.
+- `src/lib/usePlan.jsx` — `PlanProvider` + `usePlan` hook. Resuelve expiración de trial en cliente.
+  Expone: `plan`, `isReadOnly`, `canWrite`, `isTrial`, `isExpired`, `daysLeftInTrial`, `hasFeature(key)`, `canAddAthlete(count)`.
+- `src/pages/coach/Planes.jsx` — tabla comparativa de planes, plan actual resaltado, botones de acción.
+- Toda la app del coach — gating aplicado: READ-ONLY, límite de atletas con modal, features bloqueadas con CTA.
+
+**Simular estados (dev):**
+```
+# Trial activo (default al registrarse)
+# Trial vencido: ajustar trial_ends_at a fecha pasada vía set-plan-manual
+# Pro / Premium: supabase functions invoke set-plan-manual --body '{"plan":"pro"}'
+```
+
+**Edge Function `set-plan-manual`:** solo para entornos de dev/staging. En producción el plan
+cambia únicamente por webhook de Stripe (Fase C).

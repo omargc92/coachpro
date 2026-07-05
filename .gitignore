@@ -11,3 +11,5 @@ supabase/.temp
 supabase/.branches
 qa/screenshots
 .env*
+supabase/local_postgres_setup.sql
+scripts/setup-local-db.sh
