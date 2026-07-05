@@ -56,6 +56,7 @@ Stripe Billing · PWA (`vite-plugin-pwa`) · Claude (visión, estimación de mac
    - `0004_fase_b_planes.sql` — tabla `subscriptions`, enums de plan, trigger de trial.
    - `0005_fase_d_onboarding.sql` — flag `onboarding_completado`.
    - `0006_fase_b_paywall_server.sql` — **enforcement server-side** del paywall.
+   - `0007_fotos_progreso.sql` — tabla `fotos_progreso` + RPCs del portal + RLS del coach.
 3. **Crea el usuario coach** (Authentication → Users → Add user, o "Crear cuenta" en la app).
 4. **Empieza de cero**: no hay datos precargados. El coach da de alta su propio catálogo de
    ejercicios, atletas y rutinas desde la app (Catálogo → "Nuevo ejercicio", etc.).
