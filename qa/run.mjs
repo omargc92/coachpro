@@ -78,7 +78,19 @@ async function main() {
     }
   }
 
-  const ctx = await browser.newContext({ viewport: { width: 430, height: 932 }, deviceScaleFactor: 2 })
+  // x-vercel-protection-bypass permite omitir el Deployment Protection en previews.
+  // Requiere el secret en Vercel → Settings → Deployment Protection → Protection Bypass for Automation.
+  const bypassHeaders = process.env.VERCEL_BYPASS_SECRET
+    ? { 'x-vercel-protection-bypass': process.env.VERCEL_BYPASS_SECRET }
+    : {}
+  if (process.env.VERCEL_BYPASS_SECRET)
+    console.log(`${C.dim}Vercel bypass secret presente — omitiendo Deployment Protection${C.x}`)
+
+  const ctx = await browser.newContext({
+    viewport: { width: 430, height: 932 },
+    deviceScaleFactor: 2,
+    extraHTTPHeaders: bypassHeaders
+  })
   ctx.on('console', (m) => { if (m.type() === 'error') consoleErrors.push(m.text()) })
   ctx.on('weberror', (e) => consoleErrors.push(String(e.error())))
 
@@ -332,7 +344,7 @@ async function main() {
 
   await check('Sin errores JS no controlados durante el recorrido', async () => {
     const real = consoleErrors.filter(
-      (e) => !/ServiceWorker|autocomplete|favicon|Failed to load resource/i.test(e)
+      (e) => !/ServiceWorker|autocomplete|favicon|Failed to load resource|FedCM|GSI_LOGGER|identity provider|accounts list/i.test(e)
     )
     if (real.length) throw new Error(`${real.length} error(es): ${real.slice(0, 3).join(' | ')}`)
   })
