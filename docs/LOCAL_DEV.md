@@ -23,24 +23,23 @@ La más rápida. No requiere Docker ni configuración extra.
 3. Ve a **Project Settings → API** → copia:
    - `Project URL`
    - `anon public` key
-4. En **SQL Editor**, pega y ejecuta el contenido de `supabase/EJECUTAR_EN_SUPABASE.sql`.
-5. Ve a **Authentication → Users → Add user**:
-   - Email: `coach@coachpro.test`
-   - Password: `Demo1234!`
-   - Marca "Auto Confirm User"
+4. En **SQL Editor**, ejecuta las migraciones **en orden**:
+   `supabase/migrations/0001…0007`. (El bundle
+   [`supabase/migrations/EJECUTAR_EN_SUPABASE.sql`](../supabase/migrations/EJECUTAR_EN_SUPABASE.sql)
+   agrupa las fases A/B/D + paywall; léelo antes de correrlo.)
+5. Ve a **Authentication → Users → Add user** y crea **tu propio** usuario coach
+   con un email y password tuyos. Marca "Auto Confirm User". Luego regístralo en la
+   tabla `coaches` (o entra a la app por primera vez para autoprovisionarte).
 6. Crea el archivo `.env.local` con tus credenciales (ya existe la plantilla).
 7. Corre la app:
    ```bash
    npm run dev
    ```
-8. Abre `http://localhost:5173` → login con `coach@coachpro.test` / `Demo1234!`
+8. Abre `http://localhost:5173` → login con **tus** credenciales.
 
-**URLs del portal atleta (tokens fijos del seed):**
-```
-Ana:   http://localhost:5173/?token=11111111-1111-1111-1111-111111111111
-Luis:  http://localhost:5173/?token=22222222-2222-2222-2222-222222222222
-Marta: http://localhost:5173/?token=33333333-3333-3333-3333-333333333333
-```
+> El catálogo es autogestionado: no hay seed demo. Da de alta tus propios atletas
+> desde el portal del coach; el link con `?token=…` de cada atleta aparece en su
+> pantalla de detalle.
 
 ---
 

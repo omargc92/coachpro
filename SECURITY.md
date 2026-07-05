@@ -61,5 +61,5 @@ QA_COACH_EMAIL=… QA_COACH_PASS=… QA_TOKEN=… npm run qa
 
 ### 5. (Opcional) Proyecto Supabase aislado para la demo
 Para no mezclar datos reales con la demo pública, crear un proyecto Supabase separado,
-aplicar `supabase/migrations/*` + `supabase/seed.sql`, y apuntar la demo a ese proyecto
+aplicar `supabase/migrations/*`, y apuntar la demo a ese proyecto
 con sus propias `VITE_SUPABASE_URL` / `VITE_SUPABASE_ANON_KEY` en Vercel.

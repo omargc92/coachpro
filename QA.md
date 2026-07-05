@@ -169,8 +169,9 @@ Convención: marca **PASS / FAIL** y anota observación + severidad (🔴 bloque
 ### Reporte sugerido
 Por cada FAIL: **pantalla · paso (#) · esperado vs. observado · severidad · captura · pasos para reproducir.**
 
-### Datos de referencia del seed
-- **Atletas:** Ana Reyes (pérdida de grasa, ~sem 6), Luis Mora (hipertrofia, ~sem 13), Marta Díaz (recomposición, ~sem 3).
-- **Rutina Full Body A** (20 series totales): Sentadilla 4×8·60kg · Press banca 4×8·40kg · Remo con barra 3×10·35kg · Jalón al pecho 3×12·45kg · Curl bíceps 3×12·12kg · Plancha 3×1.
-- **Metas de nutrición Ana:** 1700 kcal · 130 P · 150 C · 55 G. Consumido hoy: 1000 kcal · 78 P.
-- **Mediciones Ana:** 72 → 70.8 → 69.6 → 68.9 kg (grasa 31 → 28.4 %).
+### Datos de prueba
+La base arranca **vacía** (sin seed demo). Para el QA, crea tú mismo los datos desde la app:
+1. **Catálogo** → "Nuevo ejercicio" (varios grupos musculares).
+2. **Atletas** → da de alta 1–2 atletas (copia su token de portal).
+3. **Rutinas** → arma una rutina con los ejercicios y asígnala por día.
+4. Registra mediciones, nutrición, asistencia y mensajes para cubrir las pantallas.
