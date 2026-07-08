@@ -210,7 +210,14 @@ export function useMediciones(atletaId) {
   })
 }
 
-// Rutina semanal completa del atleta (con ejercicios) — para exportar a PDF.
+// Forma canónica de la rutina semanal que consume exportPdf.js:
+//   [{ dia_semana, nombre, ejercicios: [{ nombre, series, reps, peso_kg }] }]
+// OJO: existe una segunda fuente con la MISMA forma, la RPC
+// `portal_rutina_semanal` (migración 0009) que usa `fetchPortalRutinaSemanal`
+// para el portal del atleta (acceso por token, sin sesión). Si cambia la
+// forma, hay que actualizar AMBAS (aquí y en la RPC) o los PDF divergen.
+
+// Rutina semanal completa del atleta (con ejercicios) — para exportar a PDF (lado coach).
 // Función suelta (no hook): se llama on-demand al generar el PDF.
 export async function fetchRutinaSemanalAtleta(atletaId) {
   const { data, error } = await supabase
@@ -677,7 +684,9 @@ export function usePerfilYRutina(token, fecha) {
   })
 }
 
-// Rutina semanal completa del atleta desde el portal (para exportar a PDF).
+// Rutina semanal del atleta desde el portal (para exportar a PDF, lado atleta).
+// Devuelve la MISMA forma canónica que `fetchRutinaSemanalAtleta` (ver ahí);
+// la RPC portal_rutina_semanal (0009) la construye en SQL.
 export async function fetchPortalRutinaSemanal(token) {
   const { data, error } = await supabase.rpc('portal_rutina_semanal', { p_token: token })
   if (error) throw error
@@ -699,22 +708,23 @@ export function usePortalNutricion(token, fecha) {
 // Las 3 mutaciones del portal usan mutationKey + defaults registrados en
 // queryClient.js (offline-capable). El token viaja en `variables` (no en
 // closure) para que la mutación pueda reanudarse tras recargar la app.
-export function useRegistrarSet(token) {
-  const m = useMutation({ mutationKey: ['portal', 'registrar-set'] })
+// `mapVars` arma las variables inyectando el token (por defecto lo mezcla
+// en el objeto; la asistencia recibe un `fecha` escalar).
+function usePortalMutation(mutationKey, token, mapVars = (v, tk) => ({ ...v, token: tk })) {
+  const m = useMutation({ mutationKey })
   return {
     ...m,
-    mutate: (set, opts) => m.mutate({ ...set, token }, opts),
-    mutateAsync: (set, opts) => m.mutateAsync({ ...set, token }, opts)
+    mutate: (v, opts) => m.mutate(mapVars(v, token), opts),
+    mutateAsync: (v, opts) => m.mutateAsync(mapVars(v, token), opts)
   }
 }
 
+export function useRegistrarSet(token) {
+  return usePortalMutation(['portal', 'registrar-set'], token)
+}
+
 export function useMarcarAsistencia(token) {
-  const m = useMutation({ mutationKey: ['portal', 'marcar-asistencia'] })
-  return {
-    ...m,
-    mutate: (fecha, opts) => m.mutate({ token, fecha }, opts),
-    mutateAsync: (fecha, opts) => m.mutateAsync({ token, fecha }, opts)
-  }
+  return usePortalMutation(['portal', 'marcar-asistencia'], token, (fecha, tk) => ({ token: tk, fecha }))
 }
 
 export function usePortalSesionHoy(token, fecha) {
@@ -754,12 +764,7 @@ export function usePortalProgreso(token) {
 }
 
 export function useRegistrarComida(token) {
-  const m = useMutation({ mutationKey: ['portal', 'registrar-comida'] })
-  return {
-    ...m,
-    mutate: (c, opts) => m.mutate({ ...c, token }, opts),
-    mutateAsync: (c, opts) => m.mutateAsync({ ...c, token }, opts)
-  }
+  return usePortalMutation(['portal', 'registrar-comida'], token)
 }
 
 export function usePortalMensajes(token) {

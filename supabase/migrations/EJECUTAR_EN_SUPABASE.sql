@@ -1,12 +1,15 @@
 -- ============================================================
--- CoachPro — Migraciones pendientes (Fases A, B, D + paywall server-side)
--- Ejecutar completo en: Supabase Dashboard → SQL Editor
+-- ⚠️  HISTÓRICO — NO es la fuente de verdad de migraciones.
+-- ------------------------------------------------------------
+-- Este bundle consolidó las Fases A/B/D + paywall (hasta 0006) para
+-- ejecutarlas a mano en el SQL Editor cuando no se usaba el CLI.
+-- HOY las migraciones se aplican con el CLI: `supabase db push`, y la
+-- fuente de verdad son los archivos numerados 0001…NNNN de esta carpeta.
+-- Este archivo NO incluye 0007+ y se conserva solo como referencia.
+-- No lo re-ejecutes (create type/table/policy no son idempotentes).
+-- ============================================================
+-- CoachPro — Migraciones (Fases A, B, D + paywall server-side)
 -- Orden: A → B → D → enforcement (no cambiar el orden)
---
--- Todo va en UNA transacción: si algo falla, hace rollback completo
--- (no deja estado parcial). create type/table/policy NO son idempotentes,
--- así que NO re-ejecutes este archivo si ya lo corriste: para aplicar
--- solo el enforcement server-side usa 0006_fase_b_paywall_server.sql.
 -- ============================================================
 
 begin;
