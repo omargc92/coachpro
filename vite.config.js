@@ -6,9 +6,9 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      // 'prompt' (no 'autoUpdate'): el SW nuevo NO se activa ni recarga solo.
-      // Evita el loop de recarga/cuelgue del main thread; el usuario confirma.
-      registerType: 'prompt',
+      // 'autoUpdate': el SW nuevo se activa y recarga la pestaña solo cuando hay
+      // un build nuevo (sin depender de que el usuario confirme un aviso).
+      registerType: 'autoUpdate',
       injectRegister: 'auto',
       includeAssets: ['apple-touch-icon.png', 'icons/*.png'],
       manifest: {
@@ -39,8 +39,9 @@ export default defineConfig({
         // Purga precaches viejos: un usuario con SW anterior no se queda con
         // assets hasheados que ya no existen (causa de pantallas colgadas).
         cleanupOutdatedCaches: true,
-        // El SW nuevo toma control de las pestañas abiertas al activarse
-        // (tras la confirmación del prompt). No usamos skipWaiting automático.
+        // autoUpdate: el SW nuevo salta la espera y toma control de las
+        // pestañas abiertas de inmediato; el register recarga la página.
+        skipWaiting: true,
         clientsClaim: true,
         runtimeCaching: [
           {
