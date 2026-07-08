@@ -3,7 +3,7 @@
 // Logo uploader + color pickers + restaurar defaults
 // ============================================================
 import { useRef, useState } from 'react'
-import { Screen, Header, Card, Button, Overline, Loading, Icon } from '../../lib/ui.jsx'
+import { Screen, Header, Card, Button, Overline, Loading, Icon, Field } from '../../lib/ui.jsx'
 import { colors, space, font, radius } from '../../lib/theme.js'
 import { useActualizarBranding, subirLogo } from '../../lib/queries.js'
 import { BRANDING_DEFAULTS } from '../../lib/branding.jsx'
@@ -19,6 +19,7 @@ export function Configuracion({ coach }) {
   const canUseColors = hasFeature('customColors')
 
   const [logoPreview, setLogoPreview] = useState(coach.logo_url || null)
+  const [brandName, setBrandName] = useState(coach.brand_name || '')
   const [primary, setPrimary] = useState(coach.brand_primary || BRANDING_DEFAULTS.primary)
   const [accent, setAccent] = useState(coach.brand_accent || BRANDING_DEFAULTS.accent)
   const [logoFile, setLogoFile] = useState(null)
@@ -55,6 +56,7 @@ export function Configuracion({ coach }) {
       }
       await branding.mutateAsync({
         logo_url,
+        brand_name: brandName.trim() || null,
         brand_primary: primary,
         brand_accent: accent
       })
@@ -72,11 +74,13 @@ export function Configuracion({ coach }) {
     try {
       await branding.mutateAsync({
         logo_url: null,
+        brand_name: null,
         brand_primary: null,
         brand_accent: null
       })
       setLogoPreview(null)
       setLogoFile(null)
+      setBrandName('')
       setPrimary(BRANDING_DEFAULTS.primary)
       setAccent(BRANDING_DEFAULTS.accent)
       setSaved(true)
@@ -143,6 +147,21 @@ export function Configuracion({ coach }) {
           )
         }
 
+        {/* Nombre de la app */}
+        {canUseLogo && (
+          <div style={{ marginBottom: space.md }}>
+            <Field
+              label="Nombre de la app"
+              value={brandName}
+              onChange={setBrandName}
+              placeholder="CoachPro"
+            />
+            <div style={{ ...font.small, color: colors.muted, marginTop: -6 }}>
+              Se muestra en el encabezado cuando no hay logo (tu panel y el portal del atleta).
+            </div>
+          </div>
+        )}
+
         {/* Color primario */}
         {!canUseColors
           ? <LockedFeature label="Colores white-label disponibles en plan Premium" />
@@ -178,7 +197,7 @@ export function Configuracion({ coach }) {
           <div style={{ display: 'flex', gap: space.sm, alignItems: 'center' }}>
             {logoPreview
               ? <img src={logoPreview} alt="" style={{ height: 32, objectFit: 'contain', borderRadius: 4 }} />
-              : <span style={{ ...font.title, fontSize: 17, color: colors.title }}>CoachPro</span>
+              : <span style={{ ...font.title, fontSize: 17, color: colors.title }}>{brandName || 'CoachPro'}</span>
             }
             <span
               style={{
