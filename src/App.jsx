@@ -137,10 +137,18 @@ function CoachHeader({ coach, activeTab, onConfig, onPlanes }) {
         background: colors.bg
       }}
     >
-      {coach.logo_url
-        ? <img src={coach.logo_url} alt={coach.nombre} style={{ height: 32, maxWidth: 120, objectFit: 'contain' }} />
-        : <span style={{ ...font.title, fontSize: 17, fontWeight: 700, color: colors.title }}>{coach.brand_name || 'CoachPro'}</span>
-      }
+      <div style={{ display: 'flex', alignItems: 'center', gap: 8, minWidth: 0 }}>
+        {coach.logo_url && (
+          <img src={coach.logo_url} alt="" style={{ height: 32, maxWidth: 120, objectFit: 'contain', flexShrink: 0 }} />
+        )}
+        {/* El nombre se muestra junto al logo si está configurado; si no hay ni
+            logo ni nombre, cae al nombre por defecto. */}
+        {(coach.brand_name || !coach.logo_url) && (
+          <span style={{ ...font.title, fontSize: 17, fontWeight: 700, color: colors.title, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {coach.brand_name || 'CoachPro'}
+          </span>
+        )}
+      </div>
       <button
         onClick={onConfig}
         style={{ background: 'transparent', border: 'none', cursor: 'pointer', color: colors.muted, padding: 4 }}

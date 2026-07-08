@@ -21,7 +21,9 @@ const BrandingCtx = createContext(BRANDING_DEFAULTS)
 export function BrandingProvider({ branding, children }) {
   const value = {
     logoUrl: branding?.logo_url || null,
-    name:    branding?.brand_name || BRANDING_DEFAULTS.name,
+    // Nombre crudo: null si el coach no configuró uno (para decidir si mostrarlo
+    // junto al logo o caer al nombre por defecto cuando tampoco hay logo).
+    name:    branding?.brand_name || null,
     primary: branding?.brand_primary || BRANDING_DEFAULTS.primary,
     accent:  branding?.brand_accent  || BRANDING_DEFAULTS.accent
   }

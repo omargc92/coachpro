@@ -869,17 +869,31 @@ export async function subirLogo(file, coachId) {
 }
 
 // Guarda logo_url, brand_name, brand_primary y brand_accent en el perfil del coach.
+// Usa .select() para (1) detectar si el UPDATE afectó 0 filas (fallo silencioso
+// por RLS/sesión, que antes pasaba desapercibido) y (2) refrescar la caché con la
+// fila devuelta, sin depender de un refetch.
 export function useActualizarBranding(coach) {
   const qc = useQueryClient()
   return useMutation({
     mutationFn: async ({ logo_url, brand_name, brand_primary, brand_accent }) => {
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('coaches')
         .update({ logo_url, brand_name, brand_primary, brand_accent })
         .eq('id', coach.id)
+        .select('*')
       if (error) throw error
+      if (!data || data.length === 0) {
+        throw new Error('El guardado no afectó ninguna fila (permiso o sesión). Vuelve a iniciar sesión e inténtalo de nuevo.')
+      }
+      return data[0]
     },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['coach', coach.auth_user_id] })
+    onSuccess: (row) => {
+      // Refresca la caché con la fila real devuelta (update inmediato en la UI).
+      if (row) qc.setQueryData(['coach', coach.auth_user_id], row)
+      // Invalida por PREFIJO ['coach'] (no por la key exacta con auth_user_id):
+      // así refresca la query activa esté keyada por user.id o auth_user_id.
+      qc.invalidateQueries({ queryKey: ['coach'] })
+    }
   })
 }
 
