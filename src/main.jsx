@@ -1,6 +1,9 @@
 import React from 'react'
 import { createRoot } from 'react-dom/client'
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
+import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister'
+import { get, set, del } from 'idb-keyval'
+import { queryClient } from './lib/queryClient.js'
 import { AuthProvider } from './lib/auth.jsx'
 import { ErrorBoundary } from './lib/ErrorBoundary.jsx'
 import { ReloadPrompt } from './lib/pwa.jsx'
@@ -13,20 +16,28 @@ console.log(
   !!import.meta.env.VITE_SUPABASE_ANON_KEY
 )
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: { staleTime: 30_000, refetchOnWindowFocus: false, retry: 1 }
-  }
+// Persistencia en IndexedDB: sobrevive cierres de app y guarda las
+// mutaciones pausadas (registros de avance hechos sin conexión).
+const persister = createAsyncStoragePersister({
+  storage: { getItem: get, setItem: set, removeItem: del },
+  key: 'coachpro-rq'
 })
 
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
+      <PersistQueryClientProvider
+        client={queryClient}
+        persistOptions={{ persister, maxAge: 1000 * 60 * 60 * 24 * 7 }}
+        onSuccess={() => {
+          // Al restaurar tras recargar, reintenta lo que quedó en la cola offline.
+          queryClient.resumePausedMutations()
+        }}
+      >
         <AuthProvider>
           <App />
         </AuthProvider>
-      </QueryClientProvider>
+      </PersistQueryClientProvider>
       <ReloadPrompt />
     </ErrorBoundary>
   </React.StrictMode>

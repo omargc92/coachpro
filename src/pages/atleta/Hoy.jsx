@@ -160,7 +160,10 @@ export function Hoy({ token, onIrNutricion }) {
                     <button
                       key={i}
                       onClick={() => siguiente && registrarSerie(ej)}
-                      disabled={!siguiente || registrar.isPending}
+                      // Sin `registrar.isPending`: offline la mutación queda pausada
+                      // (pending) y bloquearía TODAS las series. El optimistic update
+                      // avanza `hechos`, así que `siguiente` ya evita sobre-registrar.
+                      disabled={!siguiente}
                       style={{
                         width: 34,
                         height: 34,

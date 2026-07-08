@@ -10,8 +10,10 @@ export const colors = {
   surface2: '#16171A',
   border: '#1E1F23',
 
-  // Acento único de alto voltaje
-  accent: '#D8FF3E',     // lima eléctrico (esfuerzo / éxito)
+  // Acento único de alto voltaje. Resuelve a la variable de marca del coach
+  // (BrandingProvider setea --cp-primary); el lima es el fallback por defecto.
+  accent: 'var(--cp-primary, #D8FF3E)',
+  accentHex: '#D8FF3E',  // literal, por si se necesita fuera de CSS
   accentInk: '#0B0B0D',  // texto sobre acento
 
   // Semánticos

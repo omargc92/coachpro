@@ -1,7 +1,7 @@
 // ============================================================
 // Router raíz: decide entre Portal Atleta (?token=) | Login | Portal Coach
 // ============================================================
-import { Suspense, lazy, useState } from 'react'
+import { Suspense, lazy, useState, useEffect } from 'react'
 import { useAuth } from './lib/auth.jsx'
 import { useCoach, useSubscription } from './lib/queries.js'
 import { Screen, Loading, BottomNav, Empty, Button, Icon } from './lib/ui.jsx'
@@ -18,8 +18,24 @@ const Dashboard = lazy(() =>
 )
 
 const PARAMS  = new URLSearchParams(window.location.search)
-const TOKEN   = PARAMS.get('token')
+const URL_TOKEN = PARAMS.get('token')
 const CHECKOUT = PARAMS.get('checkout') // 'success' | 'cancelled'
+
+// El atleta entra por ?token=. Al INSTALAR la PWA, el start_url es "/" (sin
+// token), así que guardamos el token y lo reusamos cuando la app corre
+// instalada (standalone). Así el atleta no cae por error en el panel del coach.
+const ATLETA_TOKEN_KEY = 'coachpro_atleta_token'
+const safeLocal = (fn) => { try { return fn() } catch { return null } }
+
+if (URL_TOKEN) safeLocal(() => localStorage.setItem(ATLETA_TOKEN_KEY, URL_TOKEN))
+
+const IS_STANDALONE =
+  window.matchMedia?.('(display-mode: standalone)')?.matches ||
+  window.navigator.standalone === true
+
+// En navegador normal manda la URL (el coach puede entrar a "/" a loguearse).
+// Instalada (standalone) sin token en la URL → usa el token guardado del atleta.
+const TOKEN = URL_TOKEN || (IS_STANDALONE ? safeLocal(() => localStorage.getItem(ATLETA_TOKEN_KEY)) : null)
 
 export default function App() {
   if (TOKEN) return <AtletaPortal token={TOKEN} />
@@ -28,6 +44,11 @@ export default function App() {
 
 function CoachApp({ checkoutResult }) {
   const { user, loading: authLoading, signOut } = useAuth()
+  // Si alguien entra como coach en este dispositivo, olvida cualquier token de
+  // atleta guardado para que la PWA no lo redirija al portal por error.
+  useEffect(() => {
+    if (user) safeLocal(() => localStorage.removeItem(ATLETA_TOKEN_KEY))
+  }, [user])
   const coachQ = useCoach(user)
   const subQ = useSubscription(coachQ.data?.id)
   const [tab, setTab] = useState(checkoutResult === 'success' ? 'planes' : 'atletas')

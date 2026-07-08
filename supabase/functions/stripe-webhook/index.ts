@@ -1,7 +1,7 @@
 // Edge Function: stripe-webhook
 // Procesa eventos de Stripe y actualiza subscriptions en Supabase.
 // Env vars: STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET,
-//           STRIPE_PRICE_PRO, STRIPE_PRICE_PREMIUM
+//           STRIPE_PRICE_FIT, STRIPE_PRICE_PRO, STRIPE_PRICE_PREMIUM
 import Stripe from 'https://esm.sh/stripe@14.21.0?target=deno'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -16,7 +16,8 @@ const supabase = createClient(
   Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!
 )
 
-function planFromPriceId(priceId: string): 'pro' | 'premium' | 'expired' {
+function planFromPriceId(priceId: string): 'fit' | 'pro' | 'premium' | 'expired' {
+  if (priceId === Deno.env.get('STRIPE_PRICE_FIT'))     return 'fit'
   if (priceId === Deno.env.get('STRIPE_PRICE_PRO'))     return 'pro'
   if (priceId === Deno.env.get('STRIPE_PRICE_PREMIUM')) return 'premium'
   return 'expired'

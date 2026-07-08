@@ -8,7 +8,7 @@ import { usePlan } from '../../lib/usePlan.jsx'
 import { PLANS, PLAN_FEATURES_LABELS } from '../../lib/plans.js'
 import { supabase } from '../../lib/supabase.js'
 
-const PLAN_ORDER = ['pro', 'premium']
+const PLAN_ORDER = ['fit', 'pro', 'premium']
 
 export function Planes() {
   const plan = usePlan()
@@ -45,7 +45,7 @@ export function Planes() {
     }
   }
 
-  const tieneSuscripcionActiva = plan.plan === 'pro' || plan.plan === 'premium'
+  const tieneSuscripcionActiva = plan.plan === 'fit' || plan.plan === 'pro' || plan.plan === 'premium'
 
   return (
     <Screen>

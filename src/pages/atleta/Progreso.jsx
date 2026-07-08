@@ -4,7 +4,10 @@
 // ============================================================
 import { useRef, useState } from 'react'
 import { LineChart, Line, ResponsiveContainer, YAxis, XAxis, Tooltip } from 'recharts'
-import { usePortalProgreso, usePortalFotosProgreso, useAgregarFotoProgreso, subirFoto } from '../../lib/queries.js'
+import {
+  usePortalProgreso, usePortalFotosProgreso, useAgregarFotoProgreso, subirFoto,
+  usePerfilYRutina, usePortalBranding, fetchPortalRutinaSemanal, todayISO
+} from '../../lib/queries.js'
 import { Card, Overline, Badge, Button, Icon, Loading, Empty, Row } from '../../lib/ui.jsx'
 import { colors, space, font, radius } from '../../lib/theme.js'
 
@@ -17,10 +20,34 @@ const METRICAS = [
 export function Progreso({ token }) {
   const { data, isLoading } = usePortalProgreso(token)
   const { data: fotos, isLoading: fotosLoading } = usePortalFotosProgreso(token)
+  const { data: perfil } = usePerfilYRutina(token, todayISO())
+  const { data: branding } = usePortalBranding(token)
   const agregarFoto = useAgregarFotoProgreso(token)
   const fileRef = useRef(null)
   const [subiendo, setSubiendo] = useState(false)
+  const [exportando, setExportando] = useState(false)
   const [metrica, setMetrica] = useState('peso_kg')
+
+  async function exportarMiResumen() {
+    if (!perfil?.atleta) return
+    setExportando(true)
+    try {
+      const [{ exportarProgresoPDF }, rutina] = await Promise.all([
+        import('../../lib/exportPdf.js'),
+        fetchPortalRutinaSemanal(token)
+      ])
+      await exportarProgresoPDF({
+        atleta: perfil.atleta,
+        mediciones: data ?? [],
+        coach: branding || null,
+        rutina
+      })
+    } catch (err) {
+      alert('No se pudo generar el PDF: ' + (err.message || err))
+    } finally {
+      setExportando(false)
+    }
+  }
 
   async function onFile(e) {
     const file = e.target.files?.[0]
@@ -37,11 +64,26 @@ export function Progreso({ token }) {
     }
   }
 
+  // El export a PDF es feature Premium: solo se muestra si el plan del coach
+  // lo habilita (branding.export_pdf). Evita filtrar la feature a otros planes.
+  const botonExportar = branding?.export_pdf ? (
+    <Button
+      variant="surface"
+      icon={exportando ? 'loader-2' : 'file-type-pdf'}
+      onClick={exportarMiResumen}
+      disabled={exportando || !perfil?.atleta}
+      style={{ marginBottom: space.lg }}
+    >
+      {exportando ? 'Generando PDF…' : 'Descargar mi resumen (PDF)'}
+    </Button>
+  ) : null
+
   if (isLoading) return <Loading label="Cargando progreso…" />
   if (!data || data.length === 0)
     return (
       <>
         <Empty icon="chart-line" title="Sin mediciones" hint="Tu coach registrará tus mediciones." />
+        {botonExportar}
         <FotosProgresoAtleta fotos={fotos} fotosLoading={fotosLoading} fileRef={fileRef} subiendo={subiendo} />
         <input ref={fileRef} type="file" accept="image/*" capture="environment" onChange={onFile} style={{ display: 'none' }} />
       </>
@@ -132,6 +174,8 @@ export function Progreso({ token }) {
           </Card>
         ))}
       </div>
+
+      {botonExportar}
 
       <FotosProgresoAtleta fotos={fotos} fotosLoading={fotosLoading} fileRef={fileRef} subiendo={subiendo} />
       <input ref={fileRef} type="file" accept="image/*" capture="environment" onChange={onFile} style={{ display: 'none' }} />

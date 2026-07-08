@@ -1,7 +1,7 @@
 // Edge Function: create-checkout-session
 // Crea una Stripe Checkout Session para Pro o Premium.
 // Env vars requeridas en Supabase Dashboard → Edge Functions → Secrets:
-//   STRIPE_SECRET_KEY, STRIPE_PRICE_PRO, STRIPE_PRICE_PREMIUM, APP_URL
+//   STRIPE_SECRET_KEY, STRIPE_PRICE_FIT, STRIPE_PRICE_PRO, STRIPE_PRICE_PREMIUM, APP_URL
 import Stripe from 'https://esm.sh/stripe@14.21.0?target=deno'
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
@@ -11,6 +11,7 @@ const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY')!, {
 })
 
 const PRICE_IDS: Record<string, string> = {
+  fit:     Deno.env.get('STRIPE_PRICE_FIT')!,
   pro:     Deno.env.get('STRIPE_PRICE_PRO')!,
   premium: Deno.env.get('STRIPE_PRICE_PREMIUM')!
 }

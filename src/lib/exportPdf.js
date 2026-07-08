@@ -3,6 +3,7 @@
 // Gating: solo Premium (hasFeature('exportPdf')).
 // ============================================================
 import { jsPDF } from 'jspdf'
+import { DIAS } from './theme.js'
 
 const OBJETIVO_LABEL = {
   perdida_grasa: 'Pérdida de grasa',
@@ -32,7 +33,7 @@ function fechaCorta(f) {
   return `${d}/${m}`
 }
 
-export async function exportarProgresoPDF({ atleta, mediciones = [], actividad = null, coach = null }) {
+export async function exportarProgresoPDF({ atleta, mediciones = [], actividad = null, coach = null, rutina = [] }) {
   const doc = new jsPDF({ unit: 'mm', format: 'a4' })
   const W   = doc.internal.pageSize.getWidth()   // 210
   const H   = doc.internal.pageSize.getHeight()  // 297
@@ -52,6 +53,15 @@ export async function exportarProgresoPDF({ atleta, mediciones = [], actividad =
   doc.rect(0, 0, W, H, 'F')
 
   let y = 0
+
+  // Salto de página con fondo, cuando el contenido no cabe en lo que resta.
+  function nuevaPaginaSiHaceFalta(necesita) {
+    if (y + necesita <= H - 14) return
+    doc.addPage()
+    doc.setFillColor(...BG)
+    doc.rect(0, 0, W, H, 'F')
+    y = PAD + 6
+  }
 
   // ── Header bar ────────────────────────────────────────────
   doc.setFillColor(...ACCENT)
@@ -241,6 +251,60 @@ export async function exportarProgresoPDF({ atleta, mediciones = [], actividad =
       dx += dotSz + dotGap
     })
     y += 30
+  }
+
+  // ── RUTINA SEMANAL ────────────────────────────────────────
+  if (rutina.length) {
+    nuevaPaginaSiHaceFalta(18)
+    doc.setDrawColor(...ACCENT)
+    doc.setLineWidth(0.3)
+    doc.line(PAD, y, W - PAD, y)
+    y += 7
+
+    doc.setFontSize(8)
+    doc.setFont('helvetica', 'bold')
+    doc.setTextColor(...MUTED)
+    doc.setCharSpace(1.5)
+    doc.text('RUTINA SEMANAL', PAD, y)
+    doc.setCharSpace(0)
+    y += 7
+
+    rutina.forEach((dia) => {
+      const ejercicios = dia.ejercicios || []
+      // Reserva espacio para el encabezado del día + al menos una línea.
+      nuevaPaginaSiHaceFalta(14 + Math.min(ejercicios.length, 1) * 5)
+
+      // Encabezado del día
+      doc.setFillColor(...SURFACE)
+      doc.roundedRect(PAD, y, W - 2 * PAD, 9, 2, 2, 'F')
+      doc.setFontSize(9)
+      doc.setFont('helvetica', 'bold')
+      doc.setTextColor(...ACCENT)
+      doc.text(DIAS[dia.dia_semana] || '', PAD + 4, y + 6)
+      doc.setTextColor(...TITLE)
+      doc.text(dia.nombre || '—', PAD + 22, y + 6)
+      y += 12
+
+      if (!ejercicios.length) {
+        doc.setFontSize(8)
+        doc.setFont('helvetica', 'normal')
+        doc.setTextColor(...MUTED)
+        doc.text('Sin ejercicios cargados.', PAD + 4, y)
+        y += 6
+      }
+      ejercicios.forEach((e) => {
+        nuevaPaginaSiHaceFalta(6)
+        doc.setFontSize(8.5)
+        doc.setFont('helvetica', 'normal')
+        doc.setTextColor(...BODY)
+        doc.text(`•  ${e.nombre}`, PAD + 4, y)
+        const detalle = `${e.series}×${e.reps}${e.peso_kg != null ? ` · ${Number(e.peso_kg)} kg` : ''}`
+        doc.setTextColor(...MUTED)
+        doc.text(detalle, W - PAD - 2, y, { align: 'right' })
+        y += 5.5
+      })
+      y += 3
+    })
   }
 
   // ── Footer ────────────────────────────────────────────────

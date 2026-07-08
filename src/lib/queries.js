@@ -210,6 +210,34 @@ export function useMediciones(atletaId) {
   })
 }
 
+// Forma canónica de la rutina semanal que consume exportPdf.js:
+//   [{ dia_semana, nombre, ejercicios: [{ nombre, series, reps, peso_kg }] }]
+// OJO: existe una segunda fuente con la MISMA forma, la RPC
+// `portal_rutina_semanal` (migración 0009) que usa `fetchPortalRutinaSemanal`
+// para el portal del atleta (acceso por token, sin sesión). Si cambia la
+// forma, hay que actualizar AMBAS (aquí y en la RPC) o los PDF divergen.
+
+// Rutina semanal completa del atleta (con ejercicios) — para exportar a PDF (lado coach).
+// Función suelta (no hook): se llama on-demand al generar el PDF.
+export async function fetchRutinaSemanalAtleta(atletaId) {
+  const { data, error } = await supabase
+    .from('asignaciones')
+    .select('dia_semana, activa, rutinas(nombre, rutina_ejercicios(orden, series, reps, peso_kg, ejercicios(nombre)))')
+    .eq('atleta_id', atletaId)
+    .eq('activa', true)
+    .order('dia_semana')
+  if (error) throw error
+  // Normaliza a la forma que consume exportPdf: [{ dia_semana, nombre, ejercicios:[{nombre,series,reps,peso_kg}] }]
+  return (data || []).map((a) => ({
+    dia_semana: a.dia_semana,
+    nombre: a.rutinas?.nombre || '—',
+    ejercicios: (a.rutinas?.rutina_ejercicios || [])
+      .slice()
+      .sort((x, y) => x.orden - y.orden)
+      .map((re) => ({ nombre: re.ejercicios?.nombre || '—', series: re.series, reps: re.reps, peso_kg: re.peso_kg }))
+  }))
+}
+
 // Rutinas asignadas al atleta (con nombre y día).
 export function useAsignacionesAtleta(atletaId) {
   return useQuery({
@@ -481,10 +509,23 @@ export function useReordenarRutina() {
 export function useAsignarRutina() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: async ({ atleta_id, rutina_id, dia_semana }) => {
+    // dias: arreglo de días (1..7). Acepta también `dia_semana` escalar por
+    // compatibilidad. Semántica: una sola rutina activa por (atleta, día),
+    // así que reemplaza cualquier asignación activa que ya exista en esos días.
+    mutationFn: async ({ atleta_id, rutina_id, dias, dia_semana }) => {
+      const lista = Array.from(new Set((dias ?? [dia_semana]).map(Number))).filter(Boolean)
+      if (lista.length === 0) return
+      // Desactiva la rutina que hubiera en esos días (evita duplicados / choque con el índice único).
+      const { error: offErr } = await supabase
+        .from('asignaciones')
+        .update({ activa: false })
+        .eq('atleta_id', atleta_id)
+        .eq('activa', true)
+        .in('dia_semana', lista)
+      if (offErr) throw offErr
       const { error } = await supabase
         .from('asignaciones')
-        .insert({ atleta_id, rutina_id, dia_semana, activa: true })
+        .insert(lista.map((d) => ({ atleta_id, rutina_id, dia_semana: d, activa: true })))
       if (error) throw error
     },
     onSuccess: () => {
@@ -643,6 +684,15 @@ export function usePerfilYRutina(token, fecha) {
   })
 }
 
+// Rutina semanal del atleta desde el portal (para exportar a PDF, lado atleta).
+// Devuelve la MISMA forma canónica que `fetchRutinaSemanalAtleta` (ver ahí);
+// la RPC portal_rutina_semanal (0009) la construye en SQL.
+export async function fetchPortalRutinaSemanal(token) {
+  const { data, error } = await supabase.rpc('portal_rutina_semanal', { p_token: token })
+  if (error) throw error
+  return data || []
+}
+
 export function usePortalNutricion(token, fecha) {
   return useQuery({
     queryKey: ['portal', 'nutricion', token, fecha],
@@ -655,35 +705,26 @@ export function usePortalNutricion(token, fecha) {
   })
 }
 
+// Las 3 mutaciones del portal usan mutationKey + defaults registrados en
+// queryClient.js (offline-capable). El token viaja en `variables` (no en
+// closure) para que la mutación pueda reanudarse tras recargar la app.
+// `mapVars` arma las variables inyectando el token (por defecto lo mezcla
+// en el objeto; la asistencia recibe un `fecha` escalar).
+function usePortalMutation(mutationKey, token, mapVars = (v, tk) => ({ ...v, token: tk })) {
+  const m = useMutation({ mutationKey })
+  return {
+    ...m,
+    mutate: (v, opts) => m.mutate(mapVars(v, token), opts),
+    mutateAsync: (v, opts) => m.mutateAsync(mapVars(v, token), opts)
+  }
+}
+
 export function useRegistrarSet(token) {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: async (set) => {
-      const { data, error } = await supabase.rpc('portal_registrar_set', {
-        p_token: token,
-        p_ejercicio_id: set.ejercicio_id,
-        p_serie_num: set.serie_num,
-        p_reps: set.reps,
-        p_peso: set.peso,
-        p_rutina_id: set.rutina_id ?? null,
-        p_fecha: set.fecha
-      })
-      if (error) throw error
-      return data
-    },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['portal'] })
-  })
+  return usePortalMutation(['portal', 'registrar-set'], token)
 }
 
 export function useMarcarAsistencia(token) {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: async (fecha) => {
-      const { error } = await supabase.rpc('portal_marcar_asistencia', { p_token: token, p_fecha: fecha })
-      if (error) throw error
-    },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['portal'] })
-  })
+  return usePortalMutation(['portal', 'marcar-asistencia'], token, (fecha, tk) => ({ token: tk, fecha }))
 }
 
 export function usePortalSesionHoy(token, fecha) {
@@ -723,25 +764,7 @@ export function usePortalProgreso(token) {
 }
 
 export function useRegistrarComida(token) {
-  const qc = useQueryClient()
-  return useMutation({
-    mutationFn: async (c) => {
-      const { data, error } = await supabase.rpc('portal_registrar_comida', {
-        p_token: token,
-        p_momento: c.momento,
-        p_descripcion: c.descripcion || null,
-        p_kcal: c.kcal || 0,
-        p_prot: c.proteina_g || 0,
-        p_carb: c.carbos_g || 0,
-        p_gra: c.grasas_g || 0,
-        p_foto_url: c.foto_url || null,
-        p_fecha: c.fecha
-      })
-      if (error) throw error
-      return data
-    },
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['portal'] })
-  })
+  return usePortalMutation(['portal', 'registrar-comida'], token)
 }
 
 export function usePortalMensajes(token) {
@@ -852,7 +875,9 @@ export function usePortalBranding(token) {
   return useQuery({
     queryKey: ['portal', 'branding', token],
     enabled: !!token,
-    staleTime: 5 * 60 * 1000,
+    // Corto para que el atleta vea pronto los cambios de marca del coach.
+    staleTime: 30 * 1000,
+    refetchOnWindowFocus: true,
     queryFn: async () => {
       const { data, error } = await supabase.rpc('portal_branding', { p_token: token })
       if (error) throw error

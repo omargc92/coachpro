@@ -9,7 +9,7 @@ import { Screen, Card, Field, Button, Icon } from '../lib/ui.jsx'
 import { colors, space, font, radius } from '../lib/theme.js'
 import { PLANS, PLAN_FEATURES_LABELS } from '../lib/plans.js'
 
-const PLAN_ORDER = ['trial', 'pro', 'premium']
+const PLAN_ORDER = ['trial', 'fit', 'pro', 'premium']
 
 export function Landing() {
   const { signIn, signUp } = useAuth()
