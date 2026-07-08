@@ -35,7 +35,20 @@ export function BrandingProvider({ branding, children }) {
     const root = document.documentElement
     root.style.setProperty('--cp-primary', value.primary)
     root.style.setProperty('--cp-accent', value.accent)
-  }, [value.primary, value.accent])
+
+    // Ícono de la app en iOS ("Agregar a inicio"). iOS lo lee del
+    // apple-touch-icon de la página al instalar, así que lo apuntamos al logo
+    // del coach. Solo raster (PNG/JPG): iOS no soporta SVG para el ícono.
+    if (value.logoUrl && /\.(png|jpe?g)(\?|$)/i.test(value.logoUrl)) {
+      let link = document.querySelector('link[rel="apple-touch-icon"]')
+      if (!link) {
+        link = document.createElement('link')
+        link.rel = 'apple-touch-icon'
+        document.head.appendChild(link)
+      }
+      link.href = value.logoUrl
+    }
+  }, [value.primary, value.accent, value.logoUrl])
 
   return <BrandingCtx.Provider value={value}>{children}</BrandingCtx.Provider>
 }
