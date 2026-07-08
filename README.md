@@ -63,6 +63,7 @@ Stripe Billing · PWA (`vite-plugin-pwa`) · Claude (visión, estimación de mac
    - `0011_plan_fit_gating.sql` — límite de atletas de `fit` + `portal_branding.chat_enabled` (oculta asesoría).
    - `0012_sesion_sets_idempotente.sql` — registro de sets idempotente (soporte de cola offline).
    - `0013_portal_export_pdf_flag.sql` — `portal_branding.export_pdf` (gating Premium del PDF del atleta).
+   - `0014_coach_brand_name.sql` — `coaches.brand_name` (nombre de la app configurable) + `portal_branding`.
 3. **Crea el usuario coach** (Authentication → Users → Add user, o "Crear cuenta" en la app).
 4. **Empieza de cero**: no hay datos precargados. El coach da de alta su propio catálogo de
    ejercicios, atletas y rutinas desde la app (Catálogo → "Nuevo ejercicio", etc.).

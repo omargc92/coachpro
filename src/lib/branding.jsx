@@ -11,6 +11,7 @@ const DEFAULT_BRAND = colors.accentHex // #D8FF3E
 
 export const BRANDING_DEFAULTS = {
   logoUrl: null,
+  name: 'CoachPro',
   primary: DEFAULT_BRAND,
   accent: DEFAULT_BRAND
 }
@@ -20,6 +21,7 @@ const BrandingCtx = createContext(BRANDING_DEFAULTS)
 export function BrandingProvider({ branding, children }) {
   const value = {
     logoUrl: branding?.logo_url || null,
+    name:    branding?.brand_name || BRANDING_DEFAULTS.name,
     primary: branding?.brand_primary || BRANDING_DEFAULTS.primary,
     accent:  branding?.brand_accent  || BRANDING_DEFAULTS.accent
   }

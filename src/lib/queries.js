@@ -842,27 +842,40 @@ export function useSubscription(coachId) {
 // ---------- BRANDING DEL COACH ----------
 
 // Sube el logo al bucket coach-logos y devuelve la URL pública.
-// Elimina el logo anterior si existe para no acumular archivos huérfanos.
+// Usa un nombre ÚNICO por subida: el CDN de Supabase cachea por path (ignora
+// el ?v=), así que reusar el mismo path servía el logo viejo. Un path nuevo
+// cada vez garantiza que se vea el logo actualizado, sin depender de la caché.
+// Luego borra los logos anteriores del coach para no acumular huérfanos.
 export async function subirLogo(file, coachId) {
   const ext = (file.name?.split('.').pop() || 'png').toLowerCase()
-  const nombre = `${coachId}/logo.${ext}`
+  const fileName = `logo-${Date.now()}.${ext}`
+  const nombre = `${coachId}/${fileName}`
   const { error } = await supabase.storage
     .from('coach-logos')
     .upload(nombre, file, { cacheControl: '31536000', upsert: true })
   if (error) throw error
+
+  // Limpieza best-effort de logos anteriores (no bloquea si falla por policy).
+  try {
+    const { data: prev } = await supabase.storage.from('coach-logos').list(coachId)
+    const viejos = (prev || [])
+      .filter((f) => f.name !== fileName)
+      .map((f) => `${coachId}/${f.name}`)
+    if (viejos.length) await supabase.storage.from('coach-logos').remove(viejos)
+  } catch { /* no crítico */ }
+
   const { data } = supabase.storage.from('coach-logos').getPublicUrl(nombre)
-  // Rompe la caché del navegador añadiendo un timestamp.
-  return `${data.publicUrl}?v=${Date.now()}`
+  return data.publicUrl
 }
 
-// Guarda logo_url, brand_primary y brand_accent en el perfil del coach.
+// Guarda logo_url, brand_name, brand_primary y brand_accent en el perfil del coach.
 export function useActualizarBranding(coach) {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: async ({ logo_url, brand_primary, brand_accent }) => {
+    mutationFn: async ({ logo_url, brand_name, brand_primary, brand_accent }) => {
       const { error } = await supabase
         .from('coaches')
-        .update({ logo_url, brand_primary, brand_accent })
+        .update({ logo_url, brand_name, brand_primary, brand_accent })
         .eq('id', coach.id)
       if (error) throw error
     },

@@ -139,7 +139,7 @@ function CoachHeader({ coach, activeTab, onConfig, onPlanes }) {
     >
       {coach.logo_url
         ? <img src={coach.logo_url} alt={coach.nombre} style={{ height: 32, maxWidth: 120, objectFit: 'contain' }} />
-        : <span style={{ ...font.title, fontSize: 17, fontWeight: 700, color: colors.title }}>CoachPro</span>
+        : <span style={{ ...font.title, fontSize: 17, fontWeight: 700, color: colors.title }}>{coach.brand_name || 'CoachPro'}</span>
       }
       <button
         onClick={onConfig}

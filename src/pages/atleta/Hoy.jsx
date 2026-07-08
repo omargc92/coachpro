@@ -15,7 +15,7 @@ import { scoreDia, calcularRacha } from '../../lib/score.js'
 import { useBranding } from '../../lib/branding.jsx'
 
 export function Hoy({ token, onIrNutricion }) {
-  const { logoUrl, primary } = useBranding()
+  const { logoUrl, primary, name } = useBranding()
   const hoy = todayISO()
   const perfilQ = usePerfilYRutina(token, hoy)
   const sesionQ = usePortalSesionHoy(token, hoy)
@@ -82,7 +82,7 @@ export function Hoy({ token, onIrNutricion }) {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: space.md, minHeight: 36 }}>
         {logoUrl
           ? <img src={logoUrl} alt="Coach" style={{ height: 32, maxWidth: 140, objectFit: 'contain' }} />
-          : <span style={{ ...font.title, fontSize: 17, fontWeight: 700, color: primary }}>CoachPro</span>
+          : <span style={{ ...font.title, fontSize: 17, fontWeight: 700, color: primary }}>{name}</span>
         }
       </div>
 
