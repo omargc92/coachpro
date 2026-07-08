@@ -83,7 +83,7 @@ export function Card({ children, onClick, style, accent }) {
 // ---------- Botón ----------
 export function Button({ children, onClick, variant = 'primary', icon, disabled, type = 'button', style }) {
   const variants = {
-    primary: { background: colors.accent, color: colors.accentInk, border: 'none' },
+    primary: { background: 'var(--cp-accent, var(--cp-primary, #D8FF3E))', color: colors.accentInk, border: 'none' },
     ghost: { background: 'transparent', color: colors.body, border: `0.5px solid ${colors.border}` },
     surface: { background: colors.surface2, color: colors.body, border: `0.5px solid ${colors.border}` },
     danger: { background: 'transparent', color: colors.danger, border: `0.5px solid ${colors.danger}` }

@@ -875,7 +875,9 @@ export function usePortalBranding(token) {
   return useQuery({
     queryKey: ['portal', 'branding', token],
     enabled: !!token,
-    staleTime: 5 * 60 * 1000,
+    // Corto para que el atleta vea pronto los cambios de marca del coach.
+    staleTime: 30 * 1000,
+    refetchOnWindowFocus: true,
     queryFn: async () => {
       const { data, error } = await supabase.rpc('portal_branding', { p_token: token })
       if (error) throw error
