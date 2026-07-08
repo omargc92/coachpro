@@ -195,10 +195,12 @@ export function Configuracion({ coach }) {
         >
           <Overline style={{ marginBottom: 8 }}>Vista previa</Overline>
           <div style={{ display: 'flex', gap: space.sm, alignItems: 'center' }}>
-            {logoPreview
-              ? <img src={logoPreview} alt="" style={{ height: 32, objectFit: 'contain', borderRadius: 4 }} />
-              : <span style={{ ...font.title, fontSize: 17, color: colors.title }}>{brandName || 'CoachPro'}</span>
-            }
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              {logoPreview && <img src={logoPreview} alt="" style={{ height: 32, objectFit: 'contain', borderRadius: 4 }} />}
+              {(brandName || !logoPreview) && (
+                <span style={{ ...font.title, fontSize: 17, color: colors.title }}>{brandName || 'CoachPro'}</span>
+              )}
+            </div>
             <span
               style={{
                 display: 'inline-block',

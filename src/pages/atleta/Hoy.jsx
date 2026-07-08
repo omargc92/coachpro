@@ -80,10 +80,16 @@ export function Hoy({ token, onIrNutricion }) {
     <>
       {/* Header del portal con logo del coach */}
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: space.md, minHeight: 36 }}>
-        {logoUrl
-          ? <img src={logoUrl} alt="Coach" style={{ height: 32, maxWidth: 140, objectFit: 'contain' }} />
-          : <span style={{ ...font.title, fontSize: 17, fontWeight: 700, color: primary }}>{name}</span>
-        }
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'center', maxWidth: '100%' }}>
+          {logoUrl && (
+            <img src={logoUrl} alt="" style={{ height: 32, maxWidth: 140, objectFit: 'contain', flexShrink: 0 }} />
+          )}
+          {(name || !logoUrl) && (
+            <span style={{ ...font.title, fontSize: 17, fontWeight: 700, color: primary, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+              {name || 'CoachPro'}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Score protagonista */}
