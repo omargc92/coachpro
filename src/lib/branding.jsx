@@ -43,3 +43,25 @@ export function BrandingProvider({ branding, children }) {
 export function useBranding() {
   return useContext(BrandingCtx)
 }
+
+// Recuerda la última marca del coach en el dispositivo, para poder mostrarla
+// en la pantalla previa al login (donde aún no sabemos quién es).
+const LAST_BRAND_KEY = 'coachpro_last_brand'
+
+export function persistBrand(coach) {
+  try {
+    if (!coach) return
+    if (coach.logo_url || coach.brand_name || coach.brand_primary || coach.brand_accent) {
+      localStorage.setItem(LAST_BRAND_KEY, JSON.stringify({
+        logo_url: coach.logo_url || null,
+        brand_name: coach.brand_name || null,
+        brand_primary: coach.brand_primary || null,
+        brand_accent: coach.brand_accent || null
+      }))
+    }
+  } catch { /* no crítico */ }
+}
+
+export function readLastBrand() {
+  try { return JSON.parse(localStorage.getItem(LAST_BRAND_KEY) || 'null') } catch { return null }
+}
