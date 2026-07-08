@@ -30,6 +30,22 @@ export const PLANS = {
       businessDashboard: false
     }
   },
+  fit: {
+    // Plan de entrada: el atleta solo ve rutinas precargadas y registra avance.
+    // Sin asesoría (chat) ni dashboard de negocio.
+    label: 'Fit',
+    sublabel: '$99 MXN/mes',
+    price: 99,
+    maxAthletes: 10,
+    canWrite: true,
+    features: {
+      chat: false,
+      ownLogo: false,
+      customColors: false,
+      exportPdf: false,
+      businessDashboard: false
+    }
+  },
   pro: {
     label: 'Pro',
     sublabel: '$299 MXN/mes',

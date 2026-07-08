@@ -5,7 +5,7 @@
 // Deploy: supabase functions deploy set-plan-manual
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 
-const VALID_PLANS = ['trial', 'expired', 'pro', 'premium']
+const VALID_PLANS = ['trial', 'expired', 'fit', 'pro', 'premium']
 
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {

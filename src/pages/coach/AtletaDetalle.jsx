@@ -6,7 +6,8 @@ import { useState } from 'react'
 import { LineChart, Line, ResponsiveContainer, YAxis, XAxis, Tooltip } from 'recharts'
 import {
   useAtleta, useMediciones, useAsignacionesAtleta, useAtletaActividad,
-  useGuardarObjetivoNutricion, useFotosProgresoCoach, useArchivarAtleta
+  useGuardarObjetivoNutricion, useFotosProgresoCoach, useArchivarAtleta,
+  fetchRutinaSemanalAtleta
 } from '../../lib/queries.js'
 import {
   Screen, Header, Card, Row, Overline, Bar, Button, Badge, Icon, Loading, Empty, Sheet, Field
@@ -44,8 +45,11 @@ export function AtletaDetalle({ atletaId, onBack, coach }) {
   async function handleExportPDF() {
     setExportando(true)
     try {
-      const { exportarProgresoPDF } = await import('../../lib/exportPdf.js')
-      await exportarProgresoPDF({ atleta: at, mediciones: med ?? [], actividad: act, coach })
+      const [{ exportarProgresoPDF }, rutina] = await Promise.all([
+        import('../../lib/exportPdf.js'),
+        fetchRutinaSemanalAtleta(atletaId)
+      ])
+      await exportarProgresoPDF({ atleta: at, mediciones: med ?? [], actividad: act, coach, rutina })
     } catch (err) {
       alert('Error al generar PDF: ' + (err.message || err))
     } finally {

@@ -310,12 +310,19 @@ function EditarEjercicioSheet({ ejercicio, onClose, onSave }) {
 
 function AsignarSheet({ onClose, atletas, rutinaId, onAsignar }) {
   const opts = atletas.map((a) => ({ value: a.id, label: a.nombre }))
-  // Se monta al abrir: preselecciona el primer atleta.
-  const [f, setF] = useState(() => ({ atleta_id: opts[0]?.value || '', dia_semana: '1' }))
+  // Se monta al abrir: preselecciona el primer atleta y ningún día.
+  const [f, setF] = useState(() => ({ atleta_id: opts[0]?.value || '', dias: [] }))
+
+  function toggleDia(d) {
+    setF((p) => ({
+      ...p,
+      dias: p.dias.includes(d) ? p.dias.filter((x) => x !== d) : [...p.dias, d]
+    }))
+  }
 
   function guardar() {
-    if (!f.atleta_id) return
-    onAsignar({ atleta_id: f.atleta_id, rutina_id: rutinaId, dia_semana: Number(f.dia_semana) })
+    if (!f.atleta_id || f.dias.length === 0) return
+    onAsignar({ atleta_id: f.atleta_id, rutina_id: rutinaId, dias: f.dias })
     onClose()
   }
   return (
@@ -325,8 +332,37 @@ function AsignarSheet({ onClose, atletas, rutinaId, onAsignar }) {
       ) : (
         <>
           <Select label="Atleta" value={f.atleta_id} onChange={(v) => setF((p) => ({ ...p, atleta_id: v }))} options={opts} />
-          <Select label="Día de la semana" value={f.dia_semana} onChange={(v) => setF((p) => ({ ...p, dia_semana: v }))} options={DIAS_OPTS} />
-          <Button icon="check" onClick={guardar}>Asignar</Button>
+          <Overline style={{ marginBottom: 6 }}>Días de la semana</Overline>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: space.xs, marginBottom: space.md }}>
+            {DIAS_OPTS.map((o) => {
+              const d = Number(o.value)
+              const on = f.dias.includes(d)
+              return (
+                <button
+                  key={o.value}
+                  type="button"
+                  onClick={() => toggleDia(d)}
+                  style={{
+                    minWidth: 46,
+                    padding: '9px 0',
+                    borderRadius: 10,
+                    border: `0.5px solid ${on ? colors.accent : colors.border}`,
+                    background: on ? colors.accent : colors.surface,
+                    color: on ? colors.bg : colors.title,
+                    fontFamily: font.family,
+                    fontSize: 14,
+                    fontWeight: 600,
+                    cursor: 'pointer'
+                  }}
+                >
+                  {o.label}
+                </button>
+              )
+            })}
+          </div>
+          <Button icon="check" onClick={guardar} disabled={f.dias.length === 0}>
+            {f.dias.length > 1 ? `Asignar a ${f.dias.length} días` : 'Asignar'}
+          </Button>
         </>
       )}
     </Sheet>
