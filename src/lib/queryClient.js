@@ -18,7 +18,10 @@ export const queryClient = new QueryClient({
       staleTime: 30_000,
       refetchOnWindowFocus: false,
       retry: 1,
-      gcTime: 1000 * 60 * 60 * 24 // 24h: necesario para restaurar queries persistidas
+      gcTime: 1000 * 60 * 60 * 24, // 24h: necesario para restaurar queries persistidas
+      // offlineFirst: sin red, la query usa la caché (o error) en vez de quedar
+      // "paused" con data undefined (que rompía guards basados en isLoading).
+      networkMode: 'offlineFirst'
     },
     mutations: {
       networkMode: 'online', // sin red → la mutación se pausa (no se ejecuta)

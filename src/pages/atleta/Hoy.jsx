@@ -25,9 +25,10 @@ export function Hoy({ token, onIrNutricion }) {
   const asistir = useMarcarAsistencia(token)
   const [registrarOpen, setRegistrarOpen] = useState(false)
 
-  if (perfilQ.isLoading) return <Loading label="Cargando tu día…" />
+  if (perfilQ.isPending) return <Loading label="Cargando tu día…" />
   if (perfilQ.error)
     return <Empty icon="alert-triangle" title="Link inválido" hint="Pide a tu coach un nuevo enlace." />
+  if (!perfilQ.data) return <Loading label="Cargando tu día…" />
 
   const { atleta, rutina, asistio_hoy } = perfilQ.data
   const sets = sesionQ.data || []

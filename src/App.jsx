@@ -56,7 +56,7 @@ function CoachApp({ checkoutResult }) {
 
   if (authLoading) return <Screen><Loading /></Screen>
   if (!user) return <Landing />
-  if (coachQ.isLoading) return <Screen><Loading label="Preparando tu panel…" /></Screen>
+  if (coachQ.isPending) return <Screen><Loading label="Preparando tu panel…" /></Screen>
   if (coachQ.error)
     return (
       <Screen>
@@ -70,6 +70,9 @@ function CoachApp({ checkoutResult }) {
     )
 
   const coach = coachQ.data
+  // Red de seguridad: si por un estado raro (query pausada offline, restauración
+  // de caché) llegamos sin datos del coach, mostramos loading en vez de crashear.
+  if (!coach) return <Screen><Loading label="Preparando tu panel…" /></Screen>
 
   if (detalleId)
     return (
