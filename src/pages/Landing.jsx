@@ -5,6 +5,7 @@
 // ============================================================
 import { useState } from 'react'
 import { useAuth } from '../lib/auth.jsx'
+import { useBranding } from '../lib/branding.jsx'
 import { Screen, Card, Field, Button, Icon } from '../lib/ui.jsx'
 import { colors, space, font, radius } from '../lib/theme.js'
 import { PLANS, PLAN_FEATURES_LABELS } from '../lib/plans.js'
@@ -13,6 +14,7 @@ const PLAN_ORDER = ['trial', 'fit', 'pro', 'premium']
 
 export function Landing() {
   const { signIn, signUp } = useAuth()
+  const { logoUrl, name } = useBranding()  // marca recordada del coach (si hay)
   const [modo, setModo]   = useState(null)  // null | 'up' | 'in'
   const [email, setEmail] = useState('')
   const [pass, setPass]   = useState('')
@@ -36,14 +38,14 @@ export function Landing() {
       {/* Hero */}
       <div style={{ textAlign: 'center', padding: `${space.xl}px ${space.md}px ${space.lg}px` }}>
         <img
-          src="/logo.png"
-          alt="CoachPro"
+          src={logoUrl || '/logo.png'}
+          alt={name || 'CoachPro'}
           width={80}
           height={80}
-          style={{ borderRadius: '50%', display: 'block', margin: '0 auto' }}
+          style={{ borderRadius: '50%', display: 'block', margin: '0 auto', objectFit: 'contain' }}
         />
         <h1 style={{ ...font.title, fontSize: 28, color: colors.title, margin: `${space.md}px 0 ${space.sm}px`, letterSpacing: '-0.02em' }}>
-          CoachPro
+          {name || 'CoachPro'}
         </h1>
         <p style={{ ...font.body, color: colors.muted, margin: `0 0 ${space.lg}px`, maxWidth: 320, marginLeft: 'auto', marginRight: 'auto', lineHeight: 1.6 }}>
           Gestiona rutinas, nutrición y progreso de tus atletas. Todo desde el celular.

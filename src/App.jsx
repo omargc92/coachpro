@@ -6,7 +6,7 @@ import { useAuth } from './lib/auth.jsx'
 import { useCoach, useSubscription } from './lib/queries.js'
 import { Screen, Loading, BottomNav, Empty, Button, Icon } from './lib/ui.jsx'
 import { colors, space, font, radius } from './lib/theme.js'
-import { BrandingProvider } from './lib/branding.jsx'
+import { BrandingProvider, persistBrand, readLastBrand } from './lib/branding.jsx'
 import { PlanProvider, usePlan } from './lib/usePlan.jsx'
 import { Landing, Atletas, Rutinas, Catalogo, Agenda, ChatCoach, AtletaPortal, Configuracion, Planes, Onboarding } from './pages/Pages.jsx'
 
@@ -51,11 +51,17 @@ function CoachApp({ checkoutResult }) {
   }, [user])
   const coachQ = useCoach(user)
   const subQ = useSubscription(coachQ.data?.id)
+  // Recuerda la marca del coach para mostrarla en la pantalla previa al login.
+  useEffect(() => { if (coachQ.data) persistBrand(coachQ.data) }, [coachQ.data])
   const [tab, setTab] = useState(checkoutResult === 'success' ? 'planes' : 'atletas')
   const [detalleId, setDetalleId] = useState(null)
 
   if (authLoading) return <Screen><Loading /></Screen>
-  if (!user) return <Landing />
+  if (!user) return (
+    <BrandingProvider branding={readLastBrand()}>
+      <Landing />
+    </BrandingProvider>
+  )
   if (coachQ.isPending) return <Screen><Loading label="Preparando tu panel…" /></Screen>
   if (coachQ.error)
     return (

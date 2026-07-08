@@ -9,7 +9,7 @@ import { useActualizarBranding, subirLogo } from '../../lib/queries.js'
 import { BRANDING_DEFAULTS } from '../../lib/branding.jsx'
 import { usePlan } from '../../lib/usePlan.jsx'
 
-const MAX_BYTES = 1024 * 1024 // 1 MB
+const MAX_BYTES = 3 * 1024 * 1024 // 3 MB
 const ALLOWED_TYPES = ['image/png', 'image/jpeg', 'image/svg+xml']
 
 export function Configuracion({ coach }) {
@@ -32,16 +32,22 @@ export function Configuracion({ coach }) {
     const file = e.target.files?.[0]
     if (!file) return
     setLogoError(null)
+    // Diagnóstico: qué archivo llegó realmente (tipo/tamaño).
+    console.log('[CoachPro] logo seleccionado:', file.name, file.type || '(sin tipo)', file.size + 'B')
 
-    if (!ALLOWED_TYPES.includes(file.type)) {
-      setLogoError('Solo PNG, JPG o SVG')
+    // Acepta por MIME O por extensión: en móvil/algunos orígenes file.type
+    // llega vacío o distinto, y la validación estricta por MIME lo descartaba.
+    const nombre = (file.name || '').toLowerCase()
+    const extOk = /\.(png|jpe?g|svg)$/.test(nombre)
+    const typeOk = ALLOWED_TYPES.includes(file.type)
+    if (!typeOk && !extOk) {
+      setLogoError(`Formato no válido (${file.type || 'desconocido'}). Usa PNG, JPG o SVG.`)
       return
     }
     if (file.size > MAX_BYTES) {
-      setLogoError('Máximo 1 MB')
+      setLogoError(`La imagen pesa ${(file.size / 1024 / 1024).toFixed(1)} MB. Máximo 1 MB.`)
       return
     }
-    // SVG: no permitir inline; solo como <img src>. Aquí solo guardamos el archivo.
     setLogoFile(file)
     setLogoPreview(URL.createObjectURL(file))
   }
@@ -138,7 +144,7 @@ export function Configuracion({ coach }) {
                 >
                   {logoPreview ? 'Cambiar logo' : 'Subir logo'}
                 </Button>
-                <div style={{ ...font.small, color: colors.muted }}>PNG, JPG o SVG · máx 1 MB</div>
+                <div style={{ ...font.small, color: colors.muted }}>PNG, JPG o SVG · máx 3 MB</div>
                 {logoError && (
                   <div style={{ ...font.small, color: colors.danger, marginTop: 4 }}>{logoError}</div>
                 )}
