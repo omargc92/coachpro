@@ -56,6 +56,25 @@ async function expectVisible(page, text, timeout = 12000) {
   await vis(page, text).waitFor({ state: 'visible', timeout })
 }
 
+// x-vercel-protection-bypass omite el Deployment Protection en previews.
+// OJO: solo debe ir en requests al MISMO origen del preview. Si se inyecta
+// globalmente (extraHTTPHeaders) también viaja a CDNs cross-origin como
+// jsdelivr, cuyo preflight CORS lo rechaza y ensucia la consola con errores.
+async function applyBypass(ctx, baseUrl) {
+  if (!process.env.VERCEL_BYPASS_SECRET) return
+  const previewOrigin = new URL(baseUrl).origin
+  await ctx.route('**/*', async (route) => {
+    const req = route.request()
+    if (new URL(req.url()).origin === previewOrigin) {
+      await route.continue({
+        headers: { ...req.headers(), 'x-vercel-protection-bypass': process.env.VERCEL_BYPASS_SECRET }
+      })
+    } else {
+      await route.continue()
+    }
+  })
+}
+
 // ============================================================
 async function main() {
   rmSync(SHOTS, { recursive: true, force: true })
@@ -78,19 +97,14 @@ async function main() {
     }
   }
 
-  // x-vercel-protection-bypass permite omitir el Deployment Protection en previews.
-  // Requiere el secret en Vercel → Settings → Deployment Protection → Protection Bypass for Automation.
-  const bypassHeaders = process.env.VERCEL_BYPASS_SECRET
-    ? { 'x-vercel-protection-bypass': process.env.VERCEL_BYPASS_SECRET }
-    : {}
-  if (process.env.VERCEL_BYPASS_SECRET)
-    console.log(`${C.dim}Vercel bypass secret presente — omitiendo Deployment Protection${C.x}`)
-
   const ctx = await browser.newContext({
     viewport: { width: 430, height: 932 },
-    deviceScaleFactor: 2,
-    extraHTTPHeaders: bypassHeaders
+    deviceScaleFactor: 2
   })
+
+  if (process.env.VERCEL_BYPASS_SECRET)
+    console.log(`${C.dim}Vercel bypass secret presente — omitiendo Deployment Protection${C.x}`)
+  await applyBypass(ctx, CFG.url)
   ctx.on('console', (m) => { if (m.type() === 'error') consoleErrors.push(m.text()) })
   ctx.on('weberror', (e) => consoleErrors.push(String(e.error())))
 
@@ -156,13 +170,17 @@ async function main() {
     console.log(`  ${C.dim}· Onboarding detectado y saltado${C.x}`)
   } catch { /* No apareció — coach ya completó el onboarding. OK. */ }
 
-  await check('Banner de trial visible (coach en prueba)', async () => {
-    // El banner aparece si el plan es trial activo. Acepta cualquiera de los dos textos.
+  await check('Coach operativo tras login (trial, expirado o plan activo)', async () => {
+    // El coach demo está en plan Premium activo → NO muestra banner de trial.
+    // Aceptamos cualquier estado válido: trial activo, prueba terminada, o
+    // simplemente el home operativo (CTA "Nuevo atleta" presente).
     const banner  = page.getByText(/Te quedan .* días de prueba/).first()
     const expired = page.getByText('Tu prueba terminó').first()
+    const activo  = page.getByText('Nuevo atleta').first()
     await Promise.race([
-      banner.waitFor({ state: 'visible', timeout: 6000 }),
-      expired.waitFor({ state: 'visible', timeout: 6000 })
+      banner.waitFor({ state: 'visible', timeout: 8000 }),
+      expired.waitFor({ state: 'visible', timeout: 8000 }),
+      activo.waitFor({ state: 'visible', timeout: 8000 })
     ])
   })
   await shot(page, '02-coach-atletas')
@@ -249,9 +267,12 @@ async function main() {
     await expectVisible(page, '$599')
   })
 
-  await check('Botones de suscripción a Pro y Premium visibles', async () => {
-    await expectVisible(page, 'Suscribirse a Pro')
-    await expectVisible(page, 'Suscribirse a Premium')
+  await check('Planes: plan actual marcado + CTA de suscripción a otros planes', async () => {
+    // El coach demo está en Premium → su tarjeta muestra "PLAN ACTUAL" (sin CTA),
+    // y los planes restantes muestran "Suscribirse a …". Aserción robusta a qué
+    // plan tenga: debe haber un plan actual y al menos un CTA de suscripción.
+    await expectVisible(page, 'PLAN ACTUAL')
+    await expectVisible(page, 'Suscribirse a')
   })
   await page.waitForTimeout(800)
   await shot(page, '06-planes')
@@ -277,13 +298,17 @@ async function main() {
 
   await check('Portal del atleta carga el Score de Disciplina', async () => {
     await ap.goto(`${CFG.url}/?token=${CFG.token}`, { waitUntil: 'domcontentloaded', timeout: 20000 })
-    await expectVisible(ap, 'Score de disciplina')
+    // El portal arranca en <Loading> mientras resuelve perfil+rutina; en cold-start
+    // del preview esto puede tardar. Esperamos a que el loader desaparezca antes de asertar.
+    await ap.getByText('Cargando tu día…').first()
+      .waitFor({ state: 'hidden', timeout: 20000 }).catch(() => {})
+    await expectVisible(ap, 'Score de disciplina', 20000)
   })
 
-  await check('Mini-stats presentes (Asistencia / Rutina / Comida)', async () => {
+  await check('Mini-stats presentes (Asistencia / Rutina / Proteína)', async () => {
     await expectVisible(ap, 'Asistencia')
     await expectVisible(ap, 'Rutina')
-    await expectVisible(ap, 'Comida')
+    await expectVisible(ap, 'Proteína')
   })
 
   await check('Muestra rutina del día o "Día de descanso" (según el día)', async () => {
@@ -297,15 +322,28 @@ async function main() {
   await ap.waitForTimeout(1000)
   await shot(ap, '08-atleta-hoy')
 
-  await check('Pestaña Nutrición: anillo de proteína + sugerencia', async () => {
+  await check('Pestaña Nutrición: metas y menú del día (informativo)', async () => {
     await ap.getByText('Nutrición', { exact: true }).click()
-    await expectVisible(ap, 'Proteína de hoy')
+    // Nuevo modelo: el coach define metas + menú; el atleta ya no registra.
+    // Si aún no hay plan, se muestra el estado vacío.
+    const conPlan = ap.getByText('Menú del día').first()
+    const sinPlan = ap.getByText('Sin plan de nutrición').first()
+    await Promise.race([
+      conPlan.waitFor({ state: 'visible', timeout: 8000 }),
+      sinPlan.waitFor({ state: 'visible', timeout: 8000 })
+    ])
   })
   await shot(ap, '09-atleta-nutricion')
 
-  await check('Pestaña Progreso: selector de métrica + gráfica', async () => {
+  await check('Pestaña Progreso: selector de métrica o estado vacío', async () => {
     await ap.getByText('Progreso', { exact: true }).click()
-    await expectVisible(ap, 'Tu progreso')
+    // Con mediciones: encabezado "Tu progreso". Sin mediciones: estado vacío.
+    const conDatos = ap.getByText('Tu progreso').first()
+    const sinDatos = ap.getByText('Sin mediciones').first()
+    await Promise.race([
+      conDatos.waitFor({ state: 'visible', timeout: 8000 }),
+      sinDatos.waitFor({ state: 'visible', timeout: 8000 })
+    ])
   })
   await shot(ap, '10-atleta-progreso')
 
@@ -327,7 +365,11 @@ async function main() {
   })
 
   await check('Landing pública no expone datos de coaches sin autenticar', async () => {
-    const anon = await ctx.newPage()
+    // Contexto FRESCO (sin la sesión del coach): de lo contrario el storage
+    // autenticado se filtra y la "landing" mostraría el panel del coach.
+    const anonCtx = await browser.newContext({ viewport: { width: 430, height: 932 }, deviceScaleFactor: 2 })
+    await applyBypass(anonCtx, CFG.url)
+    const anon = await anonCtx.newPage()
     currentPage = anon
     await anon.goto(`${CFG.url}/?qa=${Date.now()}`, { waitUntil: 'domcontentloaded', timeout: 15000 })
     // Debe mostrar la landing, no datos privados del coach
@@ -335,7 +377,7 @@ async function main() {
     const panel = anon.getByText('Hoy en gym').first()
     const visible = await panel.isVisible().catch(() => false)
     if (visible) throw new Error('El panel del coach es visible sin autenticar')
-    await anon.close()
+    await anonCtx.close()
   })
 
   // ── CONSOLA ───────────────────────────────────────────────
