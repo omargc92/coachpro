@@ -144,6 +144,36 @@ export function Field({ label, value, onChange, type = 'text', placeholder, ...r
   )
 }
 
+// ---------- Textarea (multilínea) ----------
+export function Textarea({ label, value, onChange, placeholder, rows = 6, ...rest }) {
+  return (
+    <label style={{ display: 'block', marginBottom: space.md }}>
+      {label && <Overline style={{ marginBottom: 6 }}>{label}</Overline>}
+      <textarea
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder}
+        rows={rows}
+        {...rest}
+        style={{
+          width: '100%',
+          boxSizing: 'border-box',
+          background: colors.surface,
+          border: `0.5px solid ${colors.border}`,
+          borderRadius: radius.md,
+          padding: '13px 14px',
+          color: colors.title,
+          fontFamily: font.family,
+          fontSize: 15,
+          lineHeight: 1.5,
+          outline: 'none',
+          resize: 'vertical'
+        }}
+      />
+    </label>
+  )
+}
+
 // ---------- Select ----------
 export function Select({ label, value, onChange, options, ...rest }) {
   return (
