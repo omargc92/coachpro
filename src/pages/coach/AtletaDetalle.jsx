@@ -10,7 +10,7 @@ import {
   fetchRutinaSemanalAtleta
 } from '../../lib/queries.js'
 import {
-  Screen, Header, Card, Row, Overline, Bar, Button, Badge, Icon, Loading, Empty, Sheet, Field
+  Screen, Header, Card, Row, Overline, Button, Badge, Icon, Loading, Empty, Sheet, Field, Textarea
 } from '../../lib/ui.jsx'
 import { colors, space, font, radius, OBJETIVO_LABEL, DIAS } from '../../lib/theme.js'
 import { usePlan } from '../../lib/usePlan.jsx'
@@ -105,17 +105,17 @@ export function AtletaDetalle({ atletaId, onBack, coach }) {
         ))}
       </Card>
 
-      {/* --- Nutrición hoy --- (título en su propia línea; acción apilada debajo) */}
-      <SeccionTitulo>Adherencia nutricional · hoy</SeccionTitulo>
+      {/* --- Nutrición: metas + menú que ve el atleta --- */}
+      <SeccionTitulo>Nutrición · metas y menú</SeccionTitulo>
       <Button
         variant="surface"
         icon="adjustments"
         onClick={() => setEditObjetivo(true)}
         style={{ marginBottom: space.sm }}
       >
-        {act?.objetivo ? 'Editar metas' : 'Definir metas'}
+        {act?.objetivo ? 'Editar metas y menú' : 'Definir metas y menú'}
       </Button>
-      <Nutricion act={act} />
+      <Nutricion act={act} menu={at.menu_nutricion} />
 
       {/* --- Asistencias --- */}
       <SeccionTitulo>Asistencias recientes</SeccionTitulo>
@@ -170,6 +170,7 @@ export function AtletaDetalle({ atletaId, onBack, coach }) {
         <ObjetivoSheet
           onClose={() => setEditObjetivo(false)}
           objetivo={act?.objetivo}
+          menu={at.menu_nutricion}
           onGuardar={(metas) =>
             guardarObjetivo.mutate(metas, { onSuccess: () => setEditObjetivo(false) })
           }
@@ -242,21 +243,22 @@ function FotosProgreso({ fotos }) {
   )
 }
 
-// Sheet para que el coach defina/edite los macros objetivo del atleta.
-// Se monta al abrir, así que el estado inicial sale del objetivo vigente.
-function ObjetivoSheet({ onClose, objetivo, onGuardar, guardando }) {
+// Sheet para que el coach defina/edite los macros objetivo + el menú del atleta.
+// Se monta al abrir, así que el estado inicial sale del objetivo/menú vigente.
+function ObjetivoSheet({ onClose, objetivo, menu, onGuardar, guardando }) {
   const [f, setF] = useState(() => ({
     kcal: objetivo?.kcal != null ? String(objetivo.kcal) : '',
     proteina_g: objetivo?.proteina_g != null ? String(objetivo.proteina_g) : '',
     carbos_g: objetivo?.carbos_g != null ? String(objetivo.carbos_g) : '',
-    grasas_g: objetivo?.grasas_g != null ? String(objetivo.grasas_g) : ''
+    grasas_g: objetivo?.grasas_g != null ? String(objetivo.grasas_g) : '',
+    menu: menu || ''
   }))
   const set = (k) => (v) => setF((p) => ({ ...p, [k]: v }))
 
   return (
-    <Sheet open onClose={onClose} title="Objetivos de nutrición">
+    <Sheet open onClose={onClose} title="Nutrición del atleta">
       <div style={{ ...font.small, color: colors.hint, marginBottom: space.md }}>
-        Metas diarias del atleta. Aplican desde hoy.
+        Metas diarias de macros y menú. El atleta las ve de forma informativa.
       </div>
       <Row>
         <div style={{ flex: 1 }}><Field label="Kcal" type="number" value={f.kcal} onChange={set('kcal')} placeholder="0" /></div>
@@ -266,8 +268,15 @@ function ObjetivoSheet({ onClose, objetivo, onGuardar, guardando }) {
         <div style={{ flex: 1 }}><Field label="Carbos (g)" type="number" value={f.carbos_g} onChange={set('carbos_g')} placeholder="0" /></div>
         <div style={{ flex: 1 }}><Field label="Grasas (g)" type="number" value={f.grasas_g} onChange={set('grasas_g')} placeholder="0" /></div>
       </Row>
+      <Textarea
+        label="Menú del día"
+        value={f.menu}
+        onChange={set('menu')}
+        rows={8}
+        placeholder={'Desayuno: avena con claras y fruta\nComida: 200 g pollo, arroz y ensalada\nCena: salmón con verduras\nSnack: yogur griego'}
+      />
       <Button icon="check" onClick={() => onGuardar(f)} disabled={guardando || !(Number(f.kcal) > 0)}>
-        {guardando ? 'Guardando…' : 'Guardar objetivos'}
+        {guardando ? 'Guardando…' : 'Guardar'}
       </Button>
     </Sheet>
   )
@@ -347,36 +356,44 @@ function Mediciones({ med }) {
   )
 }
 
-function Nutricion({ act }) {
+function Nutricion({ act, menu }) {
   if (!act) return <Loading />
-  if (!act.objetivo)
+  const o = act.objetivo
+  if (!o && !menu)
     return (
       <Card style={{ marginBottom: space.lg }}>
-        <Vacio>Sin objetivos de nutrición definidos.</Vacio>
+        <Vacio>Sin metas ni menú definidos.</Vacio>
       </Card>
     )
-  const { objetivo: o, consumido: c } = act
-  const pct = (v, m) => (m ? Math.min(100, Math.round((v / m) * 100)) : 0)
   return (
     <Card style={{ marginBottom: space.lg, display: 'flex', flexDirection: 'column', gap: space.md }}>
-      <MacroBar label="Proteína" v={c.proteina_g} m={o.proteina_g} unit="g" color={colors.accent} pct={pct} />
-      <MacroBar label="Calorías" v={c.kcal} m={o.kcal} unit="kcal" color={colors.info} pct={pct} />
-      <MacroBar label="Carbos" v={c.carbos_g} m={o.carbos_g} unit="g" color={colors.muted} pct={pct} />
-      <MacroBar label="Grasas" v={c.grasas_g} m={o.grasas_g} unit="g" color={colors.muted} pct={pct} />
+      {o && (
+        <Row style={{ flexWrap: 'wrap', gap: space.sm }}>
+          <MacroMeta label="Calorías" v={o.kcal} unit="kcal" color={colors.info} />
+          <MacroMeta label="Proteína" v={o.proteina_g} unit="g" color={colors.accent} />
+          <MacroMeta label="Carbos" v={o.carbos_g} unit="g" color={colors.muted} />
+          <MacroMeta label="Grasas" v={o.grasas_g} unit="g" color={colors.muted} />
+        </Row>
+      )}
+      <div>
+        <Overline style={{ marginBottom: 6 }}>Menú del día</Overline>
+        {menu ? (
+          <div style={{ ...font.body, color: colors.body, whiteSpace: 'pre-wrap', lineHeight: 1.55 }}>{menu}</div>
+        ) : (
+          <Vacio>Sin menú. Usa “Editar metas y menú” para agregarlo.</Vacio>
+        )}
+      </div>
     </Card>
   )
 }
 
-function MacroBar({ label, v, m, unit, color, pct }) {
+function MacroMeta({ label, v, unit, color }) {
   return (
-    <div>
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 6 }}>
-        <Overline>{label}</Overline>
-        <span style={{ ...font.small, color: colors.muted }}>
-          <span style={{ color: colors.title, fontWeight: 600 }}>{v}</span> / {m} {unit}
-        </span>
+    <div style={{ flex: '1 1 40%', minWidth: 120 }}>
+      <Overline>{label}</Overline>
+      <div style={{ ...font.number, fontSize: 20, color: colors.title }}>
+        {v}<span style={{ ...font.small, color, marginLeft: 4 }}>{unit}</span>
       </div>
-      <Bar value={pct(v, m)} color={color} />
     </div>
   )
 }

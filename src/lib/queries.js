@@ -318,8 +318,17 @@ export function useGuardarObjetivoNutricion(atletaId) {
         const { error } = await supabase.from('objetivos_nutricion').insert(fila)
         if (error) throw error
       }
+
+      // Menú del día (texto libre del coach): vive en la fila del atleta.
+      // Solo se escribe si viene definido para no pisarlo sin querer.
+      if (metas.menu !== undefined) {
+        const menu = (metas.menu || '').trim() || null
+        const { error } = await supabase.from('atletas').update({ menu_nutricion: menu }).eq('id', atletaId)
+        if (error) throw error
+      }
     },
     onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['atleta', atletaId] })
       qc.invalidateQueries({ queryKey: ['atleta-actividad', atletaId] })
       qc.invalidateQueries({ queryKey: ['atletas-resumen'] })
     }
