@@ -78,19 +78,29 @@ async function main() {
     }
   }
 
-  // x-vercel-protection-bypass permite omitir el Deployment Protection en previews.
-  // Requiere el secret en Vercel → Settings → Deployment Protection → Protection Bypass for Automation.
-  const bypassHeaders = process.env.VERCEL_BYPASS_SECRET
-    ? { 'x-vercel-protection-bypass': process.env.VERCEL_BYPASS_SECRET }
-    : {}
-  if (process.env.VERCEL_BYPASS_SECRET)
-    console.log(`${C.dim}Vercel bypass secret presente — omitiendo Deployment Protection${C.x}`)
-
   const ctx = await browser.newContext({
     viewport: { width: 430, height: 932 },
-    deviceScaleFactor: 2,
-    extraHTTPHeaders: bypassHeaders
+    deviceScaleFactor: 2
   })
+
+  // x-vercel-protection-bypass omite el Deployment Protection en previews.
+  // OJO: solo debe ir en requests al MISMO origen del preview. Si se inyecta
+  // globalmente (extraHTTPHeaders) también viaja a CDNs cross-origin como
+  // jsdelivr, cuyo preflight CORS lo rechaza y ensucia la consola con errores.
+  if (process.env.VERCEL_BYPASS_SECRET) {
+    console.log(`${C.dim}Vercel bypass secret presente — omitiendo Deployment Protection${C.x}`)
+    const previewOrigin = new URL(CFG.url).origin
+    await ctx.route('**/*', async (route) => {
+      const req = route.request()
+      if (new URL(req.url()).origin === previewOrigin) {
+        await route.continue({
+          headers: { ...req.headers(), 'x-vercel-protection-bypass': process.env.VERCEL_BYPASS_SECRET }
+        })
+      } else {
+        await route.continue()
+      }
+    })
+  }
   ctx.on('console', (m) => { if (m.type() === 'error') consoleErrors.push(m.text()) })
   ctx.on('weberror', (e) => consoleErrors.push(String(e.error())))
 
@@ -277,7 +287,11 @@ async function main() {
 
   await check('Portal del atleta carga el Score de Disciplina', async () => {
     await ap.goto(`${CFG.url}/?token=${CFG.token}`, { waitUntil: 'domcontentloaded', timeout: 20000 })
-    await expectVisible(ap, 'Score de disciplina')
+    // El portal arranca en <Loading> mientras resuelve perfil+rutina; en cold-start
+    // del preview esto puede tardar. Esperamos a que el loader desaparezca antes de asertar.
+    await ap.getByText('Cargando tu día…').first()
+      .waitFor({ state: 'hidden', timeout: 20000 }).catch(() => {})
+    await expectVisible(ap, 'Score de disciplina', 20000)
   })
 
   await check('Mini-stats presentes (Asistencia / Rutina / Proteína)', async () => {
@@ -310,9 +324,15 @@ async function main() {
   })
   await shot(ap, '09-atleta-nutricion')
 
-  await check('Pestaña Progreso: selector de métrica + gráfica', async () => {
+  await check('Pestaña Progreso: selector de métrica o estado vacío', async () => {
     await ap.getByText('Progreso', { exact: true }).click()
-    await expectVisible(ap, 'Tu progreso')
+    // Con mediciones: encabezado "Tu progreso". Sin mediciones: estado vacío.
+    const conDatos = ap.getByText('Tu progreso').first()
+    const sinDatos = ap.getByText('Sin mediciones').first()
+    await Promise.race([
+      conDatos.waitFor({ state: 'visible', timeout: 8000 }),
+      sinDatos.waitFor({ state: 'visible', timeout: 8000 })
+    ])
   })
   await shot(ap, '10-atleta-progreso')
 
