@@ -280,10 +280,10 @@ async function main() {
     await expectVisible(ap, 'Score de disciplina')
   })
 
-  await check('Mini-stats presentes (Asistencia / Rutina / Comida)', async () => {
+  await check('Mini-stats presentes (Asistencia / Rutina / Proteína)', async () => {
     await expectVisible(ap, 'Asistencia')
     await expectVisible(ap, 'Rutina')
-    await expectVisible(ap, 'Comida')
+    await expectVisible(ap, 'Proteína')
   })
 
   await check('Muestra rutina del día o "Día de descanso" (según el día)', async () => {
@@ -297,9 +297,16 @@ async function main() {
   await ap.waitForTimeout(1000)
   await shot(ap, '08-atleta-hoy')
 
-  await check('Pestaña Nutrición: anillo de proteína + sugerencia', async () => {
+  await check('Pestaña Nutrición: metas y menú del día (informativo)', async () => {
     await ap.getByText('Nutrición', { exact: true }).click()
-    await expectVisible(ap, 'Proteína de hoy')
+    // Nuevo modelo: el coach define metas + menú; el atleta ya no registra.
+    // Si aún no hay plan, se muestra el estado vacío.
+    const conPlan = ap.getByText('Menú del día').first()
+    const sinPlan = ap.getByText('Sin plan de nutrición').first()
+    await Promise.race([
+      conPlan.waitFor({ state: 'visible', timeout: 8000 }),
+      sinPlan.waitFor({ state: 'visible', timeout: 8000 })
+    ])
   })
   await shot(ap, '09-atleta-nutricion')
 
