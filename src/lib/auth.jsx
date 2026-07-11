@@ -24,7 +24,14 @@ export function AuthProvider({ children }) {
     user: session?.user || null,
     loading,
     signIn: (email, password) => supabase.auth.signInWithPassword({ email, password }),
-    signUp: (email, password) => supabase.auth.signUp({ email, password }),
+    // emailRedirectTo: el link de confirmación vuelve al origen donde se registró
+    // (prod: coachpro.umbraldigital.com.mx). Debe estar en el uri_allow_list de Supabase Auth.
+    signUp: (email, password) =>
+      supabase.auth.signUp({
+        email,
+        password,
+        options: { emailRedirectTo: window.location.origin }
+      }),
     signOut: () => supabase.auth.signOut()
   }
   return <AuthCtx.Provider value={value}>{children}</AuthCtx.Provider>
