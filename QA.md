@@ -171,7 +171,10 @@ Por cada FAIL: **pantalla · paso (#) · esperado vs. observado · severidad · 
 
 ### Datos de prueba
 La base arranca **vacía** (sin seed demo). Para el QA, crea tú mismo los datos desde la app:
-1. **Catálogo** → "Nuevo ejercicio" (varios grupos musculares).
+1. **Catálogo** → "Nuevo ejercicio" (varios grupos musculares). El catálogo real del
+   coach demo (`coach@coachpro.app`, 74 ejercicios) está respaldado en
+   [`supabase/seed/ejercicios_demo.sql`](supabase/seed/ejercicios_demo.sql); córrelo
+   para restaurarlo tras un reseed (es idempotente).
 2. **Atletas** → da de alta 1–2 atletas (copia su token de portal).
 3. **Rutinas** → arma una rutina con los ejercicios y asígnala por día.
 4. Registra mediciones, nutrición, asistencia y mensajes para cubrir las pantallas.
