@@ -4,7 +4,7 @@
 import { Suspense, lazy, useState } from 'react'
 import { useMutationState } from '@tanstack/react-query'
 import { Screen, BottomNav, Loading, Icon } from '../../lib/ui.jsx'
-import { InstallBanner } from '../../lib/pwa.jsx'
+import { InstallBanner, useAthleteManifest } from '../../lib/pwa.jsx'
 import { BrandingProvider } from '../../lib/branding.jsx'
 import { usePortalBranding } from '../../lib/queries.js'
 import { colors, space, font, radius } from '../../lib/theme.js'
@@ -48,6 +48,8 @@ const NAV = [
 
 export function AtletaPortal({ token }) {
   const [tab, setTab] = useState('hoy')
+  // Al instalar la PWA desde aquí, el token viaja en el start_url del manifest.
+  useAthleteManifest(token)
   const brandingQ = usePortalBranding(token)
   const branding = brandingQ.data || null
 
