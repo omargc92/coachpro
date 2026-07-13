@@ -162,7 +162,7 @@ function UpgradeSheet({ onClose, isReadOnly, plan, maxAthletes }) {
 
 function NuevoAtletaSheet({ open, onClose, coach }) {
   const crear = useCrearAtleta(coach)
-  const [f, setF] = useState({ nombre: '', telefono: '', objetivo: 'mantenimiento', notas: '' })
+  const [f, setF] = useState({ nombre: '', telefono: '', objetivo: 'mantenimiento', fecha_nacimiento: '', notas: '' })
   const set = (k) => (v) => setF((p) => ({ ...p, [k]: v }))
 
   async function guardar() {
@@ -171,15 +171,17 @@ function NuevoAtletaSheet({ open, onClose, coach }) {
       nombre: f.nombre.trim(),
       telefono: f.telefono.trim() || null,
       objetivo: f.objetivo,
+      fecha_nacimiento: f.fecha_nacimiento || null,
       notas: f.notas.trim() || null
     })
-    setF({ nombre: '', telefono: '', objetivo: 'mantenimiento', notas: '' })
+    setF({ nombre: '', telefono: '', objetivo: 'mantenimiento', fecha_nacimiento: '', notas: '' })
     onClose()
   }
 
   return (
     <Sheet open={open} onClose={onClose} title="Nuevo atleta">
       <Field label="Nombre" value={f.nombre} onChange={set('nombre')} placeholder="Nombre y apellido" />
+      <Field label="Fecha de nacimiento" type="date" value={f.fecha_nacimiento} onChange={set('fecha_nacimiento')} />
       <Field label="Teléfono" value={f.telefono} onChange={set('telefono')} placeholder="Opcional" />
       <Select label="Objetivo" value={f.objetivo} onChange={set('objetivo')} options={OBJETIVOS} />
       <Field label="Notas" value={f.notas} onChange={set('notas')} placeholder="Opcional" />

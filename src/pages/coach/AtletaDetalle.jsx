@@ -5,14 +5,16 @@
 import { useState } from 'react'
 import { LineChart, Line, ResponsiveContainer, YAxis, XAxis, Tooltip } from 'recharts'
 import {
-  useAtleta, useMediciones, useRegistrarMedicion, useAsignacionesAtleta, useAtletaActividad,
+  useAtleta, useActualizarAtleta, useMediciones, useRegistrarMedicion, useAsignacionesAtleta, useAtletaActividad,
   useGuardarObjetivoNutricion, useFotosProgresoCoach, useArchivarAtleta,
   fetchRutinaSemanalAtleta
 } from '../../lib/queries.js'
 import {
-  Screen, Header, Card, Row, Overline, Button, Badge, Icon, Loading, Empty, Sheet, Field, Textarea
+  Screen, Header, Card, Row, Overline, Button, Badge, Icon, Loading, Empty, Sheet, Field, Select, Textarea
 } from '../../lib/ui.jsx'
 import { colors, space, font, radius, OBJETIVO_LABEL, DIAS } from '../../lib/theme.js'
+
+const OBJETIVOS = Object.entries(OBJETIVO_LABEL).map(([value, label]) => ({ value, label }))
 import { usePlan } from '../../lib/usePlan.jsx'
 
 export function AtletaDetalle({ atletaId, onBack, coach }) {
@@ -23,15 +25,19 @@ export function AtletaDetalle({ atletaId, onBack, coach }) {
   const { data: act } = useAtletaActividad(atletaId)
   const { data: fotos } = useFotosProgresoCoach(atletaId)
   const guardarObjetivo = useGuardarObjetivoNutricion(atletaId)
+  const actualizarAtleta = useActualizarAtleta(coach?.id)
   const archivar = useArchivarAtleta(coach?.id)
   const { hasFeature } = usePlan()
   const [copiado, setCopiado]             = useState(false)
   const [editObjetivo, setEditObjetivo]   = useState(false)
   const [nuevaMedicion, setNuevaMedicion] = useState(false)
+  const [editAtleta, setEditAtleta]       = useState(false)
   const [exportando, setExportando]       = useState(false)
   const [confirmEliminar, setConfirmEliminar] = useState(false)
 
   if (isLoading || !at) return <Screen><Loading /></Screen>
+
+  const edad = calcularEdad(at.fecha_nacimiento)
 
   async function copiarLink() {
     const url = `${window.location.origin}/?token=${at.token}`
@@ -63,8 +69,21 @@ export function AtletaDetalle({ atletaId, onBack, coach }) {
     <Screen>
       <Header
         title={at.nombre}
-        subtitle={OBJETIVO_LABEL[at.objetivo]}
+        subtitle={
+          edad != null
+            ? `${OBJETIVO_LABEL[at.objetivo]} · ${edad} años`
+            : OBJETIVO_LABEL[at.objetivo]
+        }
         onBack={onBack}
+        right={
+          <button
+            onClick={() => setEditAtleta(true)}
+            style={{ background: 'transparent', border: 'none', color: colors.accent, cursor: 'pointer', padding: 4 }}
+            title="Editar datos del atleta"
+          >
+            <Icon name="pencil" size={20} />
+          </button>
+        }
       />
 
       <Button
@@ -86,7 +105,7 @@ export function AtletaDetalle({ atletaId, onBack, coach }) {
       >
         Registrar medición
       </Button>
-      <Mediciones med={med} />
+      <Mediciones med={med} edad={edad} />
 
       {/* --- Fotos de progreso --- */}
       <SeccionTitulo>Fotos de progreso</SeccionTitulo>
@@ -175,6 +194,17 @@ export function AtletaDetalle({ atletaId, onBack, coach }) {
       >
         Eliminar atleta
       </Button>
+
+      {editAtleta && (
+        <EditarAtletaSheet
+          atleta={at}
+          onClose={() => setEditAtleta(false)}
+          onGuardar={(datos) =>
+            actualizarAtleta.mutate({ id: at.id, ...datos }, { onSuccess: () => setEditAtleta(false) })
+          }
+          guardando={actualizarAtleta.isPending}
+        />
+      )}
 
       {nuevaMedicion && (
         <MedicionSheet
@@ -306,9 +336,7 @@ function ObjetivoSheet({ onClose, objetivo, menu, onGuardar, guardando }) {
 // Se monta al abrir: arranca con la fecha de hoy y el resto vacío.
 function MedicionSheet({ onClose, onGuardar, guardando }) {
   const hoy = new Date().toISOString().slice(0, 10)
-  const [f, setF] = useState(() => ({
-    fecha: hoy, peso_kg: '', grasa_pct: '', cintura_cm: '', pecho_cm: '', brazo_cm: '', pierna_cm: ''
-  }))
+  const [f, setF] = useState(() => ({ fecha: hoy, peso_kg: '', estatura_cm: '' }))
   const set = (k) => (v) => setF((p) => ({ ...p, [k]: v }))
   const num = (v) => (v !== '' && !Number.isNaN(Number(v)) ? Number(v) : null)
   const pesoOk = Number(f.peso_kg) > 0
@@ -318,34 +346,19 @@ function MedicionSheet({ onClose, onGuardar, guardando }) {
     onGuardar({
       fecha: f.fecha || hoy,
       peso_kg: Number(f.peso_kg),
-      grasa_pct: num(f.grasa_pct),
-      cintura_cm: num(f.cintura_cm),
-      pecho_cm: num(f.pecho_cm),
-      brazo_cm: num(f.brazo_cm),
-      pierna_cm: num(f.pierna_cm)
+      estatura_cm: num(f.estatura_cm)
     })
   }
 
   return (
     <Sheet open onClose={onClose} title="Nueva medición">
       <div style={{ ...font.small, color: colors.hint, marginBottom: space.md }}>
-        El peso es obligatorio. Las medidas corporales son opcionales.
+        El peso es obligatorio. La estatura es opcional.
       </div>
+      <Field label="Fecha" type="date" value={f.fecha} onChange={set('fecha')} />
       <Row>
-        <div style={{ flex: 1 }}><Field label="Fecha" type="date" value={f.fecha} onChange={set('fecha')} /></div>
         <div style={{ flex: 1 }}><Field label="Peso (kg)" type="number" value={f.peso_kg} onChange={set('peso_kg')} placeholder="0" /></div>
-      </Row>
-      <Row>
-        <div style={{ flex: 1 }}><Field label="Grasa (%)" type="number" value={f.grasa_pct} onChange={set('grasa_pct')} placeholder="—" /></div>
-        <div style={{ flex: 1 }}><Field label="Cintura (cm)" type="number" value={f.cintura_cm} onChange={set('cintura_cm')} placeholder="—" /></div>
-      </Row>
-      <Row>
-        <div style={{ flex: 1 }}><Field label="Pecho (cm)" type="number" value={f.pecho_cm} onChange={set('pecho_cm')} placeholder="—" /></div>
-        <div style={{ flex: 1 }}><Field label="Brazo (cm)" type="number" value={f.brazo_cm} onChange={set('brazo_cm')} placeholder="—" /></div>
-      </Row>
-      <Row>
-        <div style={{ flex: 1 }}><Field label="Pierna (cm)" type="number" value={f.pierna_cm} onChange={set('pierna_cm')} placeholder="—" /></div>
-        <div style={{ flex: 1 }} />
+        <div style={{ flex: 1 }}><Field label="Estatura (cm)" type="number" value={f.estatura_cm} onChange={set('estatura_cm')} placeholder="—" /></div>
       </Row>
       <Button icon="check" onClick={guardar} disabled={guardando || !pesoOk}>
         {guardando ? 'Guardando…' : 'Guardar'}
@@ -354,7 +367,43 @@ function MedicionSheet({ onClose, onGuardar, guardando }) {
   )
 }
 
-function Mediciones({ med }) {
+// Sheet para editar los datos básicos del atleta (incluye fecha de nacimiento → edad).
+function EditarAtletaSheet({ atleta, onClose, onGuardar, guardando }) {
+  const [f, setF] = useState(() => ({
+    nombre: atleta.nombre || '',
+    telefono: atleta.telefono || '',
+    objetivo: atleta.objetivo || 'mantenimiento',
+    fecha_nacimiento: atleta.fecha_nacimiento || '',
+    notas: atleta.notas || ''
+  }))
+  const set = (k) => (v) => setF((p) => ({ ...p, [k]: v }))
+
+  function guardar() {
+    if (!f.nombre.trim()) return
+    onGuardar({
+      nombre: f.nombre.trim(),
+      telefono: f.telefono.trim() || null,
+      objetivo: f.objetivo,
+      fecha_nacimiento: f.fecha_nacimiento || null,
+      notas: f.notas.trim() || null
+    })
+  }
+
+  return (
+    <Sheet open onClose={onClose} title="Editar atleta">
+      <Field label="Nombre" value={f.nombre} onChange={set('nombre')} placeholder="Nombre y apellido" />
+      <Field label="Fecha de nacimiento" type="date" value={f.fecha_nacimiento} onChange={set('fecha_nacimiento')} />
+      <Field label="Teléfono" value={f.telefono} onChange={set('telefono')} placeholder="Opcional" />
+      <Select label="Objetivo" value={f.objetivo} onChange={set('objetivo')} options={OBJETIVOS} />
+      <Field label="Notas" value={f.notas} onChange={set('notas')} placeholder="Opcional" />
+      <Button icon="check" onClick={guardar} disabled={guardando || !f.nombre.trim()}>
+        {guardando ? 'Guardando…' : 'Guardar'}
+      </Button>
+    </Sheet>
+  )
+}
+
+function Mediciones({ med, edad }) {
   if (!med) return <Loading />
   if (!med.length)
     return (
@@ -365,28 +414,37 @@ function Mediciones({ med }) {
   const ultima = med[med.length - 1]
   const primera = med[0]
   const delta = (ultima.peso_kg - primera.peso_kg).toFixed(1)
+  const estatura = ultima.estatura_cm != null ? Number(ultima.estatura_cm) : null
   const data = med.map((m) => ({ fecha: fechaCorta(m.fecha), peso: Number(m.peso_kg) }))
 
   return (
     <Card style={{ marginBottom: space.lg }}>
-      <Row style={{ marginBottom: space.sm }}>
-        <div style={{ flex: 1 }}>
+      <Row style={{ marginBottom: space.sm, flexWrap: 'wrap', rowGap: space.sm }}>
+        <div style={{ flex: '1 1 30%' }}>
           <Overline>Peso actual</Overline>
           <div style={{ ...font.big, fontSize: 34, color: colors.title }}>
             {Number(ultima.peso_kg)}<span style={{ fontSize: 16, color: colors.muted }}> kg</span>
           </div>
         </div>
-        <div style={{ flex: 1 }}>
+        <div style={{ flex: '1 1 30%' }}>
           <Overline>Cambio</Overline>
           <div style={{ ...font.big, fontSize: 34, color: delta <= 0 ? colors.accent : colors.info }}>
             {delta > 0 ? '+' : ''}{delta}<span style={{ fontSize: 16, color: colors.muted }}> kg</span>
           </div>
         </div>
-        {ultima.grasa_pct != null && (
-          <div style={{ flex: 1 }}>
-            <Overline>Grasa</Overline>
+        {estatura != null && (
+          <div style={{ flex: '1 1 30%' }}>
+            <Overline>Estatura</Overline>
             <div style={{ ...font.big, fontSize: 34, color: colors.title }}>
-              {Number(ultima.grasa_pct)}<span style={{ fontSize: 16, color: colors.muted }}>%</span>
+              {estatura}<span style={{ fontSize: 16, color: colors.muted }}> cm</span>
+            </div>
+          </div>
+        )}
+        {edad != null && (
+          <div style={{ flex: '1 1 30%' }}>
+            <Overline>Edad</Overline>
+            <div style={{ ...font.big, fontSize: 34, color: colors.title }}>
+              {edad}<span style={{ fontSize: 16, color: colors.muted }}> años</span>
             </div>
           </div>
         )}
@@ -480,4 +538,15 @@ function Vacio({ children }) {
 function fechaCorta(f) {
   const [, m, d] = f.split('-')
   return `${d}/${m}`
+}
+// Edad en años a partir de la fecha de nacimiento (YYYY-MM-DD). null si no hay dato válido.
+function calcularEdad(fechaNac) {
+  if (!fechaNac) return null
+  const [y, m, d] = fechaNac.split('-').map(Number)
+  if (!y || !m || !d) return null
+  const hoy = new Date()
+  let edad = hoy.getFullYear() - y
+  const antesDeCumplir = hoy.getMonth() + 1 < m || (hoy.getMonth() + 1 === m && hoy.getDate() < d)
+  if (antesDeCumplir) edad--
+  return edad >= 0 && edad < 150 ? edad : null
 }
