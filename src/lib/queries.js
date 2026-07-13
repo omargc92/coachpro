@@ -180,6 +180,20 @@ export function useCrearAtleta(coach) {
   })
 }
 
+export function useActualizarAtleta(coachId) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ id, ...datos }) => {
+      const { error } = await supabase.from('atletas').update(datos).eq('id', id)
+      if (error) throw error
+    },
+    onSuccess: (_d, { id }) => {
+      qc.invalidateQueries({ queryKey: ['atleta', id] })
+      qc.invalidateQueries({ queryKey: ['atletas-resumen'] })
+    }
+  })
+}
+
 // ---------- DETALLE DE ATLETA ----------
 
 export function useAtleta(atletaId) {
