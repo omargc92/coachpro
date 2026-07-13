@@ -210,6 +210,20 @@ export function useMediciones(atletaId) {
   })
 }
 
+// Registra una nueva medición del atleta (peso obligatorio; medidas opcionales).
+export function useRegistrarMedicion(atletaId) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (campos) => {
+      const { error } = await supabase
+        .from('mediciones')
+        .insert({ atleta_id: atletaId, ...campos })
+      if (error) throw error
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['mediciones', atletaId] })
+  })
+}
+
 // Forma canónica de la rutina semanal que consume exportPdf.js:
 //   [{ dia_semana, nombre, ejercicios: [{ nombre, series, reps, peso_kg }] }]
 // OJO: existe una segunda fuente con la MISMA forma, la RPC

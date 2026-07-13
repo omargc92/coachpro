@@ -5,7 +5,7 @@
 import { useState } from 'react'
 import { LineChart, Line, ResponsiveContainer, YAxis, XAxis, Tooltip } from 'recharts'
 import {
-  useAtleta, useMediciones, useAsignacionesAtleta, useAtletaActividad,
+  useAtleta, useMediciones, useRegistrarMedicion, useAsignacionesAtleta, useAtletaActividad,
   useGuardarObjetivoNutricion, useFotosProgresoCoach, useArchivarAtleta,
   fetchRutinaSemanalAtleta
 } from '../../lib/queries.js'
@@ -18,6 +18,7 @@ import { usePlan } from '../../lib/usePlan.jsx'
 export function AtletaDetalle({ atletaId, onBack, coach }) {
   const { data: at, isLoading } = useAtleta(atletaId)
   const { data: med } = useMediciones(atletaId)
+  const registrarMedicion = useRegistrarMedicion(atletaId)
   const { data: asign } = useAsignacionesAtleta(atletaId)
   const { data: act } = useAtletaActividad(atletaId)
   const { data: fotos } = useFotosProgresoCoach(atletaId)
@@ -26,6 +27,7 @@ export function AtletaDetalle({ atletaId, onBack, coach }) {
   const { hasFeature } = usePlan()
   const [copiado, setCopiado]             = useState(false)
   const [editObjetivo, setEditObjetivo]   = useState(false)
+  const [nuevaMedicion, setNuevaMedicion] = useState(false)
   const [exportando, setExportando]       = useState(false)
   const [confirmEliminar, setConfirmEliminar] = useState(false)
 
@@ -76,6 +78,14 @@ export function AtletaDetalle({ atletaId, onBack, coach }) {
 
       {/* --- Mediciones --- */}
       <SeccionTitulo>Mediciones</SeccionTitulo>
+      <Button
+        variant="surface"
+        icon="plus"
+        onClick={() => setNuevaMedicion(true)}
+        style={{ marginBottom: space.sm }}
+      >
+        Registrar medición
+      </Button>
       <Mediciones med={med} />
 
       {/* --- Fotos de progreso --- */}
@@ -165,6 +175,16 @@ export function AtletaDetalle({ atletaId, onBack, coach }) {
       >
         Eliminar atleta
       </Button>
+
+      {nuevaMedicion && (
+        <MedicionSheet
+          onClose={() => setNuevaMedicion(false)}
+          onGuardar={(campos) =>
+            registrarMedicion.mutate(campos, { onSuccess: () => setNuevaMedicion(false) })
+          }
+          guardando={registrarMedicion.isPending}
+        />
+      )}
 
       {editObjetivo && (
         <ObjetivoSheet
@@ -276,6 +296,58 @@ function ObjetivoSheet({ onClose, objetivo, menu, onGuardar, guardando }) {
         placeholder={'Desayuno: avena con claras y fruta\nComida: 200 g pollo, arroz y ensalada\nCena: salmón con verduras\nSnack: yogur griego'}
       />
       <Button icon="check" onClick={() => onGuardar(f)} disabled={guardando || !(Number(f.kcal) > 0)}>
+        {guardando ? 'Guardando…' : 'Guardar'}
+      </Button>
+    </Sheet>
+  )
+}
+
+// Sheet para que el coach registre una nueva medición del atleta.
+// Se monta al abrir: arranca con la fecha de hoy y el resto vacío.
+function MedicionSheet({ onClose, onGuardar, guardando }) {
+  const hoy = new Date().toISOString().slice(0, 10)
+  const [f, setF] = useState(() => ({
+    fecha: hoy, peso_kg: '', grasa_pct: '', cintura_cm: '', pecho_cm: '', brazo_cm: '', pierna_cm: ''
+  }))
+  const set = (k) => (v) => setF((p) => ({ ...p, [k]: v }))
+  const num = (v) => (v !== '' && !Number.isNaN(Number(v)) ? Number(v) : null)
+  const pesoOk = Number(f.peso_kg) > 0
+
+  function guardar() {
+    if (!pesoOk) return
+    onGuardar({
+      fecha: f.fecha || hoy,
+      peso_kg: Number(f.peso_kg),
+      grasa_pct: num(f.grasa_pct),
+      cintura_cm: num(f.cintura_cm),
+      pecho_cm: num(f.pecho_cm),
+      brazo_cm: num(f.brazo_cm),
+      pierna_cm: num(f.pierna_cm)
+    })
+  }
+
+  return (
+    <Sheet open onClose={onClose} title="Nueva medición">
+      <div style={{ ...font.small, color: colors.hint, marginBottom: space.md }}>
+        El peso es obligatorio. Las medidas corporales son opcionales.
+      </div>
+      <Row>
+        <div style={{ flex: 1 }}><Field label="Fecha" type="date" value={f.fecha} onChange={set('fecha')} /></div>
+        <div style={{ flex: 1 }}><Field label="Peso (kg)" type="number" value={f.peso_kg} onChange={set('peso_kg')} placeholder="0" /></div>
+      </Row>
+      <Row>
+        <div style={{ flex: 1 }}><Field label="Grasa (%)" type="number" value={f.grasa_pct} onChange={set('grasa_pct')} placeholder="—" /></div>
+        <div style={{ flex: 1 }}><Field label="Cintura (cm)" type="number" value={f.cintura_cm} onChange={set('cintura_cm')} placeholder="—" /></div>
+      </Row>
+      <Row>
+        <div style={{ flex: 1 }}><Field label="Pecho (cm)" type="number" value={f.pecho_cm} onChange={set('pecho_cm')} placeholder="—" /></div>
+        <div style={{ flex: 1 }}><Field label="Brazo (cm)" type="number" value={f.brazo_cm} onChange={set('brazo_cm')} placeholder="—" /></div>
+      </Row>
+      <Row>
+        <div style={{ flex: 1 }}><Field label="Pierna (cm)" type="number" value={f.pierna_cm} onChange={set('pierna_cm')} placeholder="—" /></div>
+        <div style={{ flex: 1 }} />
+      </Row>
+      <Button icon="check" onClick={guardar} disabled={guardando || !pesoOk}>
         {guardando ? 'Guardando…' : 'Guardar'}
       </Button>
     </Sheet>
