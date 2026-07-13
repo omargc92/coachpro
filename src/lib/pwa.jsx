@@ -21,42 +21,28 @@ export function ReloadPrompt() {
   return null
 }
 
-// Reescribe el manifest para que su start_url/id incluyan el token del atleta.
-// Motivo: al INSTALAR la PWA, la app abre en el start_url del manifest ('/'),
-// sin token. Recuperarlo de localStorage falla en iOS (la app instalada usa un
-// almacenamiento separado de Safari) y cuando el ícono abre en pestaña normal.
-// Metiendo el token en el start_url, la app instalada abre directo en el portal
-// del atleta sin depender del storage ni de la detección de standalone.
+// Apunta el <link rel="manifest"> a un manifest por atleta cuyo start_url/id
+// incluyen el token. Motivo: al INSTALAR la PWA, la app abre en el start_url
+// del manifest ('/'), sin token. Recuperarlo de localStorage falla en iOS (la
+// app instalada usa un almacenamiento separado de Safari).
+//
+// El manifest se sirve REAL por HTTP (/api/manifest?token=…), no como blob:.
+// Un blob no lo honra iOS al "Agregar a inicio" (sigue usando el manifest
+// estático cacheado con start_url:'/'); una URL real y distinta la tratan
+// iOS/Chrome como recurso nuevo y la leen fresco. Así la app instalada abre
+// directo en /?token=… sin depender del storage ni de la detección de
+// standalone. Se mantiene el fallback de localStorage como red de seguridad.
 export function useAthleteManifest(token) {
   useEffect(() => {
     if (!token) return
     const link = document.querySelector('link[rel="manifest"]')
     const original = link?.getAttribute('href')
-    if (!link || !original) return
+    if (!link) return
 
-    let objUrl
-    let cancelled = false
-    ;(async () => {
-      try {
-        const res = await fetch(original, { cache: 'no-store' })
-        const mani = await res.json()
-        const start = `/?token=${encodeURIComponent(token)}`
-        mani.start_url = start
-        mani.id = start
-        if (cancelled) return
-        objUrl = URL.createObjectURL(
-          new Blob([JSON.stringify(mani)], { type: 'application/manifest+json' })
-        )
-        link.setAttribute('href', objUrl)
-      } catch {
-        /* si falla, queda el manifest estático + el fallback de localStorage */
-      }
-    })()
+    link.setAttribute('href', `/api/manifest?token=${encodeURIComponent(token)}`)
 
     return () => {
-      cancelled = true
-      link.setAttribute('href', original)
-      if (objUrl) URL.revokeObjectURL(objUrl)
+      if (original) link.setAttribute('href', original)
     }
   }, [token])
 }
