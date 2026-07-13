@@ -442,6 +442,54 @@ export function useCrearRutina(coach) {
   })
 }
 
+export function useActualizarRutina() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async ({ id, nombre, descripcion }) => {
+      const { error } = await supabase
+        .from('rutinas')
+        .update({ nombre, descripcion: descripcion || null })
+        .eq('id', id)
+      if (error) throw error
+    },
+    onSuccess: () => invalidarRutina(qc)
+  })
+}
+
+// Clonar: duplica la rutina y sus ejercicios (sin asignaciones) para reutilizarla.
+export function useClonarRutina(coach) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (rutinaId) => {
+      const [{ data: orig, error: e1 }, { data: ejers, error: e2 }] = await Promise.all([
+        supabase.from('rutinas').select('nombre, descripcion').eq('id', rutinaId).single(),
+        supabase
+          .from('rutina_ejercicios')
+          .select('ejercicio_id, orden, series, reps, peso_kg, descanso_seg')
+          .eq('rutina_id', rutinaId)
+          .order('orden')
+      ])
+      if (e1) throw e1
+      if (e2) throw e2
+
+      const { data: nueva, error: e3 } = await supabase
+        .from('rutinas')
+        .insert({ coach_id: coach.id, nombre: `${orig.nombre} (copia)`, descripcion: orig.descripcion })
+        .select('*')
+        .single()
+      if (e3) throw e3
+
+      if (ejers.length) {
+        const filas = ejers.map((e) => ({ ...e, rutina_id: nueva.id }))
+        const { error: e4 } = await supabase.from('rutina_ejercicios').insert(filas)
+        if (e4) throw e4
+      }
+      return nueva
+    },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ['rutinas'] })
+  })
+}
+
 export function useEliminarRutina() {
   const qc = useQueryClient()
   return useMutation({

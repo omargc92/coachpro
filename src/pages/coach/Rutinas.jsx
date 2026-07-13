@@ -3,7 +3,7 @@
 // ============================================================
 import { useState } from 'react'
 import {
-  useRutinas, useRutinaDetalle, useCrearRutina, useEliminarRutina,
+  useRutinas, useRutinaDetalle, useCrearRutina, useActualizarRutina, useClonarRutina, useEliminarRutina,
   useAgregarEjercicioARutina, useActualizarRutinaEjercicio, useEliminarRutinaEjercicio,
   useReordenarRutina, useAsignarRutina, useQuitarAsignacion, useAtletasLista, useEjercicios
 } from '../../lib/queries.js'
@@ -17,6 +17,7 @@ const DIAS_OPTS = [1, 2, 3, 4, 5, 6, 7].map((d) => ({ value: String(d), label: D
 export function Rutinas({ coach }) {
   const { data: rutinas, isLoading } = useRutinas(coach)
   const crear = useCrearRutina(coach)
+  const clonar = useClonarRutina(coach)
   const [abierta, setAbierta] = useState(null) // rutinaId
   const [nueva, setNueva] = useState(false)
   const [f, setF] = useState({ nombre: '', descripcion: '' })
@@ -84,6 +85,14 @@ export function Rutinas({ coach }) {
               <div style={{ ...font.body, fontWeight: 600, color: colors.title }}>{r.nombre}</div>
               <div style={{ ...font.small, color: colors.muted }}>{r.num_ejercicios} ejercicios</div>
             </div>
+            <button
+              onClick={(e) => { e.stopPropagation(); clonar.mutate(r.id) }}
+              disabled={clonar.isPending}
+              style={iconBtn(clonar.isPending)}
+              title="Clonar rutina"
+            >
+              <Icon name="copy" size={18} />
+            </button>
             <Icon name="chevron-right" size={18} color={colors.hint} />
           </Card>
         ))}
@@ -120,11 +129,13 @@ function RutinaBuilder({ coach, rutinaId, onBack }) {
   const reordenar = useReordenarRutina()
   const asignar = useAsignarRutina()
   const quitar = useQuitarAsignacion()
+  const actualizarRutina = useActualizarRutina()
   const borrarRutina = useEliminarRutina()
 
   const [addOpen, setAddOpen] = useState(false)
   const [editEj, setEditEj] = useState(null)
   const [asignOpen, setAsignOpen] = useState(false)
+  const [editRutina, setEditRutina] = useState(false)
 
   if (isLoading || !data) return <Screen><Loading /></Screen>
   const { rutina, ejercicios, asignaciones } = data
@@ -145,7 +156,20 @@ function RutinaBuilder({ coach, rutinaId, onBack }) {
 
   return (
     <Screen>
-      <Header title={rutina.nombre} subtitle="Editar rutina" onBack={onBack} />
+      <Header
+        title={rutina.nombre}
+        subtitle="Editar rutina"
+        onBack={onBack}
+        right={
+          <button
+            onClick={() => setEditRutina(true)}
+            style={{ background: 'transparent', border: 'none', color: colors.accent, cursor: 'pointer', padding: 4 }}
+            title="Editar nombre"
+          >
+            <Icon name="pencil" size={20} />
+          </button>
+        }
+      />
 
       <Overline style={{ marginBottom: space.sm }}>Ejercicios</Overline>
       {ejercicios.length === 0 && (
@@ -231,7 +255,36 @@ function RutinaBuilder({ coach, rutinaId, onBack }) {
           onAsignar={(payload) => asignar.mutate(payload)}
         />
       )}
+      {editRutina && (
+        <EditarRutinaSheet
+          rutina={rutina}
+          onClose={() => setEditRutina(false)}
+          onSave={(campos) => actualizarRutina.mutate({ id: rutina.id, ...campos })}
+        />
+      )}
     </Screen>
+  )
+}
+
+function EditarRutinaSheet({ rutina, onClose, onSave }) {
+  // Se monta al abrir con una rutina concreta: estado inicial de sus props.
+  const [f, setF] = useState(() => ({
+    nombre: rutina.nombre || '',
+    descripcion: rutina.descripcion || ''
+  }))
+
+  function guardar() {
+    if (!f.nombre.trim()) return
+    onSave({ nombre: f.nombre.trim(), descripcion: f.descripcion.trim() })
+    onClose()
+  }
+
+  return (
+    <Sheet open onClose={onClose} title="Editar rutina">
+      <Field label="Nombre" value={f.nombre} onChange={(v) => setF((p) => ({ ...p, nombre: v }))} placeholder="Ej. Full Body A" />
+      <Field label="Descripción" value={f.descripcion} onChange={(v) => setF((p) => ({ ...p, descripcion: v }))} placeholder="Opcional" />
+      <Button icon="check" onClick={guardar} disabled={!f.nombre.trim()}>Guardar</Button>
+    </Sheet>
   )
 }
 
