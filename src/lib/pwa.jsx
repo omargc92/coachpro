@@ -21,17 +21,17 @@ export function ReloadPrompt() {
   return null
 }
 
-// Apunta el <link rel="manifest"> a un manifest por atleta cuyo start_url/id
-// incluyen el token. Motivo: al INSTALAR la PWA, la app abre en el start_url
-// del manifest ('/'), sin token. Recuperarlo de localStorage falla en iOS (la
-// app instalada usa un almacenamiento separado de Safari).
+// Respaldo del manifest por atleta para navegación SPA. El mecanismo PRINCIPAL
+// vive en index.html: un script síncrono en el <head> crea el <link
+// rel="manifest"> con el token ANTES de que Safari lea cualquier manifest.
+// Esto es obligatorio en iOS, que lee el manifest al cargar la página y NO
+// vuelve a leerlo cuando JS cambia el href después (un useEffect llega tarde:
+// iOS ya instaló con start_url:'/' y abre el login del coach).
 //
-// El manifest se sirve REAL por HTTP (/api/manifest?token=…), no como blob:.
-// Un blob no lo honra iOS al "Agregar a inicio" (sigue usando el manifest
-// estático cacheado con start_url:'/'); una URL real y distinta la tratan
-// iOS/Chrome como recurso nuevo y la leen fresco. Así la app instalada abre
-// directo en /?token=… sin depender del storage ni de la detección de
-// standalone. Se mantiene el fallback de localStorage como red de seguridad.
+// Aquí solo reforzamos el href por si la app llegó a esta vista sin token en la
+// URL inicial. El manifest se sirve REAL por HTTP (/api/manifest?token=…): un
+// blob: no lo honra iOS al "Agregar a inicio". Se mantiene además el fallback
+// de localStorage (ver App.jsx) como red de seguridad.
 export function useAthleteManifest(token) {
   useEffect(() => {
     if (!token) return

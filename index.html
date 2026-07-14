@@ -3,6 +3,29 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <!-- PWA por atleta (crítico para iOS). Si la URL trae ?token=, el
+         <link rel="manifest"> DEBE apuntar al manifest del atleta ANTES de que
+         Safari lo lea: iOS lee el manifest al cargar la página y NO vuelve a
+         leerlo cuando JS le cambia el href después (por eso el swap en el
+         useEffect de React llegaba tarde e iOS instalaba con start_url:"/",
+         abriendo el login del coach). Este script corre síncrono durante el
+         parseo del <head>, así que su <link> queda ANTES del estático que
+         inyecta VitePWA al final del <head>; el navegador usa el primero. Sin
+         token (coach) no hace nada y se usa el manifest estático. -->
+    <script>
+      (function () {
+        try {
+          var t = new URLSearchParams(location.search).get('token')
+          if (!t || t.length > 256) return
+          var link = document.createElement('link')
+          link.rel = 'manifest'
+          link.href = '/api/manifest?token=' + encodeURIComponent(t)
+          document.head.appendChild(link)
+        } catch (e) {}
+      })()
+    </script>
+
     <title>CoachPro — Plataforma de coaching fitness</title>
     <meta name="description" content="Gestiona rutinas, nutrición, asistencia y progreso de tus atletas. Trial gratis 14 días sin tarjeta. Planes desde $299 MXN/mes." />
     <meta name="keywords" content="coaching fitness, entrenador personal, app gym, seguimiento atletas, rutinas, nutrición" />
