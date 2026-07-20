@@ -14,8 +14,9 @@ export function Nutricion({ token }) {
 
   const objetivo = data?.objetivo
   const menu = data?.menu
+  const recomendaciones = data?.recomendaciones
 
-  if (!objetivo && !menu)
+  if (!objetivo && !menu && !recomendaciones)
     return <Empty icon="salad" title="Sin plan de nutrición" hint="Tu coach aún no define tus macros ni tu menú." />
 
   return (
@@ -48,6 +49,17 @@ export function Nutricion({ token }) {
         </Card>
       ) : (
         <Empty icon="bowl" title="Sin menú por ahora" hint="Tu coach aún no cargó el menú de hoy." />
+      )}
+
+      {/* Recomendaciones específicas del atleta (texto libre escrito por el coach) */}
+      {recomendaciones && (
+        <>
+          <Overline style={{ marginBottom: space.sm }}>Recomendaciones</Overline>
+          <Card style={{ marginBottom: space.lg, display: 'flex', gap: space.sm, alignItems: 'flex-start' }}>
+            <Icon name="bulb" size={20} color={colors.accent} style={{ marginTop: 2, flexShrink: 0 }} />
+            <div style={{ ...font.body, color: colors.body, whiteSpace: 'pre-wrap', lineHeight: 1.55 }}>{recomendaciones}</div>
+          </Card>
+        </>
       )}
 
       <div style={{ ...font.small, color: colors.hint, textAlign: 'center', marginTop: space.sm }}>
