@@ -6,7 +6,7 @@ import { useState } from 'react'
 import { LineChart, Line, ResponsiveContainer, YAxis, XAxis, Tooltip } from 'recharts'
 import {
   useAtleta, useActualizarAtleta, useMediciones, useRegistrarMedicion, useAsignacionesAtleta, useAtletaActividad,
-  useGuardarObjetivoNutricion, useFotosProgresoCoach, useArchivarAtleta,
+  useGuardarObjetivoNutricion, useGuardarRecomendaciones, useFotosProgresoCoach, useArchivarAtleta,
   fetchRutinaSemanalAtleta
 } from '../../lib/queries.js'
 import {
@@ -25,11 +25,13 @@ export function AtletaDetalle({ atletaId, onBack, coach }) {
   const { data: act } = useAtletaActividad(atletaId)
   const { data: fotos } = useFotosProgresoCoach(atletaId)
   const guardarObjetivo = useGuardarObjetivoNutricion(atletaId)
+  const guardarRecomendaciones = useGuardarRecomendaciones(atletaId)
   const actualizarAtleta = useActualizarAtleta(coach?.id)
   const archivar = useArchivarAtleta(coach?.id)
   const { hasFeature } = usePlan()
   const [copiado, setCopiado]             = useState(false)
   const [editObjetivo, setEditObjetivo]   = useState(false)
+  const [editRecom, setEditRecom]         = useState(false)
   const [nuevaMedicion, setNuevaMedicion] = useState(false)
   const [editAtleta, setEditAtleta]       = useState(false)
   const [exportando, setExportando]       = useState(false)
@@ -146,6 +148,18 @@ export function AtletaDetalle({ atletaId, onBack, coach }) {
       </Button>
       <Nutricion act={act} menu={at.menu_nutricion} />
 
+      {/* --- Recomendaciones específicas del atleta --- */}
+      <SeccionTitulo>Recomendaciones</SeccionTitulo>
+      <Button
+        variant="surface"
+        icon="pencil"
+        onClick={() => setEditRecom(true)}
+        style={{ marginBottom: space.sm }}
+      >
+        {at.recomendaciones ? 'Editar recomendaciones' : 'Agregar recomendaciones'}
+      </Button>
+      <Recomendaciones texto={at.recomendaciones} />
+
       {/* --- Asistencias --- */}
       <SeccionTitulo>Asistencias recientes</SeccionTitulo>
       <Card style={{ marginBottom: space.lg }}>
@@ -225,6 +239,17 @@ export function AtletaDetalle({ atletaId, onBack, coach }) {
             guardarObjetivo.mutate(metas, { onSuccess: () => setEditObjetivo(false) })
           }
           guardando={guardarObjetivo.isPending}
+        />
+      )}
+
+      {editRecom && (
+        <RecomendacionesSheet
+          onClose={() => setEditRecom(false)}
+          texto={at.recomendaciones}
+          onGuardar={(texto) =>
+            guardarRecomendaciones.mutate(texto, { onSuccess: () => setEditRecom(false) })
+          }
+          guardando={guardarRecomendaciones.isPending}
         />
       )}
 
@@ -514,6 +539,40 @@ function Nutricion({ act, menu }) {
         )}
       </div>
     </Card>
+  )
+}
+
+function Recomendaciones({ texto }) {
+  return (
+    <Card style={{ marginBottom: space.lg }}>
+      {texto ? (
+        <div style={{ ...font.body, color: colors.body, whiteSpace: 'pre-wrap', lineHeight: 1.55 }}>{texto}</div>
+      ) : (
+        <Vacio>Sin recomendaciones. Usa “Agregar recomendaciones” para escribirlas.</Vacio>
+      )}
+    </Card>
+  )
+}
+
+// Sheet para que el coach escriba recomendaciones específicas del atleta (texto libre).
+function RecomendacionesSheet({ onClose, texto, onGuardar, guardando }) {
+  const [v, setV] = useState(() => texto || '')
+  return (
+    <Sheet open onClose={onClose} title="Recomendaciones del atleta">
+      <div style={{ ...font.small, color: colors.hint, marginBottom: space.md }}>
+        Notas y recomendaciones específicas para este atleta. Las ve de forma informativa.
+      </div>
+      <Textarea
+        label="Recomendaciones"
+        value={v}
+        onChange={setV}
+        rows={8}
+        placeholder={'Ej.: Toma 2.5 L de agua al día\nDuerme mínimo 7 h\nEstira después de entrenar\nEvita comer 2 h antes de dormir'}
+      />
+      <Button icon="check" onClick={() => onGuardar(v)} disabled={guardando}>
+        {guardando ? 'Guardando…' : 'Guardar'}
+      </Button>
+    </Sheet>
   )
 }
 

@@ -363,6 +363,22 @@ export function useGuardarObjetivoNutricion(atletaId) {
   })
 }
 
+// Guarda las recomendaciones específicas del atleta (texto libre del coach).
+// Vive en la fila del atleta y se reemplaza en cada edición, igual que el menú.
+export function useGuardarRecomendaciones(atletaId) {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: async (texto) => {
+      const recomendaciones = (texto || '').trim() || null
+      const { error } = await supabase.from('atletas').update({ recomendaciones }).eq('id', atletaId)
+      if (error) throw error
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ['atleta', atletaId] })
+    }
+  })
+}
+
 // ---------- CATÁLOGO DE EJERCICIOS ----------
 
 export function useEjercicios(coach) {
